@@ -4,8 +4,6 @@ import numpy as np
 from PIL import Image
 from typing import List, Tuple, Dict
 import pytesseract
-from transformers import pipeline
-import torch
 
 def calculate_metrics(gt_text: str, pred_text: str) -> Dict[str, float]:
     """
@@ -74,11 +72,18 @@ def preprocess_image(image: np.ndarray) -> np.ndarray:
     return processed
 
 def load_labels_from_dir(directory: str) -> Dict[str, str]:
-    """Load ground truth labels from text files"""
+    """Load ground truth labels from text files, searching subdirectories."""
     labels = {}
-    for filename in os.listdir(directory):
-        if filename.lower().endswith('.txt'):
-            filepath = os.join(directory, filename)
-            with open(filepath, 'r', encoding='utf-8') as f:
-                labels[filename.replace('.txt', '')] = f.read().strip()
+    for root, dirs, files in os.walk(directory):
+        for filename in files:
+            if filename.lower().endswith('.txt'):
+                filepath = os.path.join(root, filename)
+                # Create a key that matches the relative path of the image
+                # (relative to the base 'labels' directory specified in config)
+                rel_path = os.path.relpath(filepath, directory)
+                # Remove the .txt extension for the key
+                label_key = os.path.splitext(rel_path)[0]
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    labels[label_key] = f.read().strip()
+                    print(f"[DEBUG utils.py] Loaded label key: '{label_key}'")
     return labels

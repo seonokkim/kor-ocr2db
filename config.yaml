@@ -7,8 +7,7 @@ image_processing_steps:
   - 'denoising'
 model_path: null # 사용할 모델 파일 경로 (null이면 기본 모델 사용)
 models_to_evaluate:
-  - 'paddleocr'
-  - 'huggingface'
+  - 'easyocr'
   - 'tesseract'
 output_directory: 'evaluation_results'
 metrics:

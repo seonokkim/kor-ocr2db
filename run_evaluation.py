@@ -1,12 +1,10 @@
 import yaml
 import os
 from utils import load_images_from_dir, load_labels_from_dir, calculate_metrics
-from paddleocr import PaddleOCR
-from transformers import pipeline
-import pytesseract
+import easyocr
 import cv2
 import numpy as np
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import json
 
 def preprocess_image(image: np.ndarray, steps: List[str]) -> np.ndarray:
@@ -31,6 +29,36 @@ def preprocess_image(image: np.ndarray, steps: List[str]) -> np.ndarray:
     
     return processed
 
+def load_images_from_dir(directory: str) -> List[Tuple[str, np.ndarray]]:
+    """Load images from directory and subdirectories with their filenames"""
+    images = []
+    for root, dirs, files in os.walk(directory):
+        for filename in files:
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+                img_path = os.path.join(root, filename)
+                img = cv2.imread(img_path)
+                if img is not None:
+                    # Use the full path relative to data directory as filename
+                    rel_path = os.path.relpath(img_path, directory)
+                    images.append((rel_path, img))
+                    print(f"[DEBUG run_evaluation.py] Loaded image key: '{rel_path}'")
+    return images
+
+def load_labels_from_dir(directory: str) -> Dict[str, str]:
+    """Load ground truth labels from text files in subdirectories"""
+    labels = {}
+    for root, dirs, files in os.walk(directory):
+        for filename in files:
+            if filename.lower().endswith('.txt'):
+                filepath = os.path.join(root, filename)
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    # Use the full path relative to labels directory as key
+                    rel_path = os.path.relpath(filepath, directory)
+                    # Remove .txt extension for matching
+                    key = os.path.splitext(rel_path)[0]
+                    labels[key] = f.read().strip()
+    return labels
+
 def evaluate_ocr(config: Dict):
     """Run OCR evaluation with different models and preprocessing steps"""
     results = []
@@ -39,44 +67,44 @@ def evaluate_ocr(config: Dict):
     images = load_images_from_dir(os.path.join(config['data_directory'], 'images'))
     labels = load_labels_from_dir(os.path.join(config['data_directory'], 'labels'))
     
-    # Initialize models
-    paddle_ocr = PaddleOCR(use_angle_cls=True, lang=config['language'])
-    huggingface_ocr = pipeline('ocr', model='microsoft/trocr-large-printed')
+    # Print loaded data statistics
+    print(f"Loaded {len(images)} images")
+    print(f"Loaded {len(labels)} labels")
+    
+    # Initialize OCR reader
+    reader = easyocr.Reader(['ko'], gpu=config.get('use_gpu', False), verbose=False)
     
     # Create output directory
     os.makedirs(config['output_directory'], exist_ok=True)
     
     # Process each image
     for filename, image in images:
-        if filename not in labels:
+        # Use the filename without extension to match labels
+        filename_without_ext = os.path.splitext(filename)[0]
+        if filename_without_ext not in labels:
+            print(f"Warning: No label found for image: {filename}")
             continue
             
-        gt_text = labels[filename]
+        gt_text = labels[filename_without_ext]
         
         # Evaluate raw image
         for model_name in config['models_to_evaluate']:
-            if model_name == 'paddleocr':
-                result = paddle_ocr.ocr(image, cls=True)
-                pred_text = ' '.join([line[1][0] for line in result[0]])
-            elif model_name == 'huggingface':
-                result = huggingface_ocr(image)
-                pred_text = result[0]['text'] if result else ''
+            if model_name == 'easyocr':
+                result = reader.readtext(image)
+                pred_text = ' '.join([text[1] for text in result])
             elif model_name == 'tesseract':
-                pred_text = pytesseract.image_to_string(image, lang=config['language'])
+                pred_text = pytesseract.image_to_string(image, lang='kor')
             
             metrics = calculate_metrics(gt_text, pred_text)
             
             # Process image and evaluate again
             processed_image = preprocess_image(image, config['image_processing_steps'])
             
-            if model_name == 'paddleocr':
-                result_processed = paddle_ocr.ocr(processed_image, cls=True)
-                pred_text_processed = ' '.join([line[1][0] for line in result_processed[0]])
-            elif model_name == 'huggingface':
-                result_processed = huggingface_ocr(processed_image)
-                pred_text_processed = result_processed[0]['text'] if result_processed else ''
+            if model_name == 'easyocr':
+                result_processed = reader.readtext(processed_image)
+                pred_text_processed = ' '.join([text[1] for text in result_processed])
             elif model_name == 'tesseract':
-                pred_text_processed = pytesseract.image_to_string(processed_image, lang=config['language'])
+                pred_text_processed = pytesseract.image_to_string(processed_image, lang='kor')
             
             metrics_processed = calculate_metrics(gt_text, pred_text_processed)
             
