@@ -9,7 +9,7 @@ def load_config(config_path='config.yaml'):
         config = yaml.safe_load(f)
     return config
 
-def apply_image_processing(image, steps):
+def pt(image, steps):
     processed_image = image.copy()
     for step in steps:
         if step == 'sharpening':
