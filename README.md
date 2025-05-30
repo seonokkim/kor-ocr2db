@@ -20,17 +20,20 @@ This project aims to perform optical character recognition (OCR) on Korean text 
     It's recommended to use a virtual environment.
 
     ```bash
-    # Create a virtual environment
-    python -m venv .venv
+    # Create a virtual environment (if it doesn't exist, one named 'venv' is expected by default)
+    python -m venv venv
     
     # Activate the virtual environment
     # On Windows:
-    # .venv\Scripts\activate
+    venv\Scripts\activate
     # On macOS/Linux:
-    # source .venv/bin/activate
+    # source venv/bin/activate
     
-    # Install dependencies
-    pip install -r requirements.txt
+    # Install dependencies (using the virtual environment's pip)
+    # On Windows:
+    venv\Scripts\python.exe -m pip install -r requirements.txt
+    # On macOS/Linux:
+    # venv/bin/python -m pip install -r requirements.txt
     ```
 
 ## Configuration
@@ -39,10 +42,15 @@ Edit `config.yaml` to adjust settings.
 
 -   `use_gpu`: Set to `True` to enable GPU acceleration (requires compatible GPU, CUDA, and GPU-enabled libraries). Set to `False` for CPU-only execution.
 
-## Running the Project
+## Running the Evaluation
+
+To run the OCR evaluation script:
 
 ```bash
-python main.py
+# On Windows:
+venv\Scripts\python.exe run_evaluation.py
+# On macOS/Linux:
+# venv/bin/python run_evaluation.py
 ```
 
 ## GPU Acceleration
