@@ -1,14 +1,9 @@
-data/
-venv/
-.venv/
-
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
 build/
 develop-eggs/
 dist/
@@ -25,31 +20,49 @@ wheels/
 .installed.cfg
 *.egg
 
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+.env
+
 # IDE
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
+.DS_Store
 
-# Environment variables
-.env
-.env.local
-.env.*.local
-.env.*
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Data
+data/
 
 # Logs
 *.log
 logs/
+log/
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Model files and checkpoints
+*.h5
+*.pth
+*.pt
+*.ckpt
+*.bin
+*.model
+trained_models/
 
-# Database
-*.db
-*.sqlite3
+# Temporary files
+*.tmp
+*.temp
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+.coverage.*
+coverage.xml
+*.cover 

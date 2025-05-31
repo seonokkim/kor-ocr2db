@@ -1,62 +1,84 @@
-# kor-ocr2db
+# Korean OCR Evaluation Framework
 
-Korean OCR to Database Project
+This repository provides a comprehensive framework for evaluating the performance of Korean OCR models.
 
-## Overview
+## Key Features
 
-This project aims to perform optical character recognition (OCR) on Korean text from images and store the results, exploring different methods for optimal performance.
+- Support for multiple OCR models:
+  - EasyOCR
+  - PaddleOCR (Optional - requires successful installation)
+  - Tesseract (Planned)
+  - YOLO-based OCR (Planned)
+
+- Modular image preprocessing steps:
+  - Sharpening
+  - Denoising
+  - Binarization
+
+- GPU/CPU support
+- Comprehensive evaluation metrics:
+  - Item Accuracy (Bounding box matching)
+  - Character Accuracy
+  - Inference Time
+  - Accuracy by Text Type
+  - Accuracy by Location (Top/Middle/Bottom)
+  - Accuracy by Text Length (Short/Medium/Long)
+  - Accuracy by Bounding Box Size (Small/Medium/Large)
+  - Text Similarity (Normalized Levenshtein, ROUGE, BLEU)
+
+- Structured results saving (JSON files with sequential numbering)
+- Performance report generation (CSV files with sequential numbering)
 
 ## Setup
 
-1.  Clone the repository:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/seonokkim/kor-ocr-rag
+   cd kor-ocr-rag
+   ```
 
-    ```bash
-    git clone https://github.com/seonokkim/kor-ocr2db.git
-    cd kor-ocr2db
-    ```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   ```
 
-2.  Install dependencies:
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+   *Note: PaddleOCR installation can sometimes be tricky due to dependencies. If you encounter issues, the script is designed to skip PaddleOCR evaluation if the module is not available.*
 
-    It's recommended to use a virtual environment.
+## Usage
 
-    ```bash
-    # Create a virtual environment (if it doesn't exist, one named 'venv' is expected by default)
-    python -m venv venv
-    
-    # Activate the virtual environment
-    # On Windows:
-    venv\Scripts\activate
-    # On macOS/Linux:
-    # source venv/bin/activate
-    
-    # Install dependencies (using the virtual environment's pip)
-    # On Windows:
-    venv\Scripts\python.exe -m pip install -r requirements.txt
-    # On macOS/Linux:
-    # venv/bin/python -m pip install -r requirements.txt
-    ```
+1. Organize your data:
+   Place your test images in the directory specified by `data.test_dir` and corresponding label JSON files in `data.label_dir` in `configs/default_config.yaml`. The current structure expects images in `test_dir/images/...` and labels in `label_dir/labels/...`.
 
-## Configuration
+2. Configure your evaluation:
+   Modify `configs/default_config.yaml` to select the model(s), preprocessing steps, and hardware settings (GPU/CPU) you want to use.
 
-Edit `config.yaml` to adjust settings.
+3. Run the evaluation script:
+   ```bash
+   python src/run_evaluation.py
+   ```
+   This will perform the evaluation based on your configuration, save detailed results as JSON files with sequential numbering, and generate a performance report CSV file with sequential numbering in the `results/` directory.
 
--   `use_gpu`: Set to `True` to enable GPU acceleration (requires compatible GPU, CUDA, and GPU-enabled libraries). Set to `False` for CPU-only execution.
+## Project Structure
 
-## Running the Evaluation
-
-To run the OCR evaluation script:
-
-```bash
-# On Windows:
-venv\Scripts\python.exe run_evaluation.py
-# On macOS/Linux:
-# venv/bin/python run_evaluation.py
+```
+kor-ocr-rag/
+├── data/                      # Data folder (images, labels)
+├── src/
+│   ├── models/               # OCR model implementations
+│   ├── preprocessing/        # Image preprocessing modules
+│   ├── evaluation/          # Performance evaluation module
+│   └── utils/               # Utility functions
+├── tests/                   # Test code
+├── configs/                 # Configuration files
+├── results/                 # Experiment results and reports
+└── requirements.txt         # Dependency packages
 ```
 
-## GPU Acceleration
+## License
 
-To use GPU acceleration, you need a compatible NVIDIA GPU, CUDA Toolkit, and cuDNN. Install the GPU-compatible versions of libraries like `paddleocr` (e.g., `pip install paddleocr paddlepaddle-gpu`). Refer to the specific library's documentation for detailed GPU installation instructions.
-
-## Models
-
-This project aims to integrate and compare different high-performance OCR models for Korean. Model files should be placed in a designated directory (e.g., `models/`). Details on specific models and how to use them will be added as they are integrated. 
+MIT License 
