@@ -6,14 +6,14 @@ __all__ = [
     'EasyOCRModel',
 ]
 
-# PaddleOCR 모델은 선택적으로 로드
+# PaddleOCR model is loaded optionally
 try:
     from .paddleocr import PaddleOCRModel
     __all__.append('PaddleOCRModel')
     PADDLEOCR_AVAILABLE = True
 except ImportError as e:
-    print(f"\nWarning: PaddleOCR 모델을 불러올 수 없습니다 - {str(e)}")
-    print("PaddleOCR 모델은 평가에서 제외됩니다.")
+    print(f"\nWarning: Could not load PaddleOCR model - {str(e)}")
+    print("PaddleOCR model will be excluded from evaluation.")
     PADDLEOCR_AVAILABLE = False
 
 # 모델 로더 함수 등 필요한 유틸리티 임포트

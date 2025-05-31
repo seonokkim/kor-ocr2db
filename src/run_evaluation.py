@@ -74,7 +74,7 @@ def convert_bbox_to_x1y1x2y2(bbox, fmt='easyocr'):
         raise ValueError(f"Unknown bounding box format: {fmt}")
 
 def load_test_data(config: Dict[str, Any]) -> tuple:
-    """Loads test data (including subfolders, loads all annotations)."""
+    """Load test data (including subfolders, loads all annotations)."""
     images = []
     ground_truth_annotations = [] # Store list of all annotations instead of list of texts
     

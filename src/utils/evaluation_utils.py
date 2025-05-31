@@ -188,16 +188,16 @@ def load_all_results() -> Dict[str, Any]:
     return all_results
 
 def plot_performance_comparison(df: pd.DataFrame, metric: str = 'item_accuracy'):
-    """성능 비교 그래프를 생성합니다."""
+    """Generate performance comparison graph."""
     plt.figure(figsize=(12, 6))
     
-    # 모델별 성능 비교
+    # Compare performance by model
     plt.subplot(1, 2, 1)
     sns.barplot(data=df, x='model', y=metric)
     plt.title(f'Model Performance Comparison ({metric})')
     plt.xticks(rotation=45)
     
-    # 전처리 효과 비교
+    # Compare preprocessing effects
     plt.subplot(1, 2, 2)
     sns.boxplot(data=df, x='preprocessing', y=metric)
     plt.title(f'Preprocessing Effect on {metric}')
@@ -248,21 +248,25 @@ def generate_performance_report(all_results: Dict[str, Any]) -> pd.DataFrame:
             row['average_normalized_levenshtein'] = ts_metrics.get('normalized_levenshtein', 0)
             row['average_bleu_score'] = ts_metrics.get('bleu_score', 0)
             if 'rouge_scores' in ts_metrics:
-                 for r_metric in ['rouge-1', 'rouge-2', 'rouge-l']:
-                      row[f'average_rouge_{r_metric}'] = ts_metrics['rouge_scores'].get(r_metric, 0)
+                for rouge_type, score in ts_metrics['rouge_scores'].items():
+                    row[f'average_rouge_{rouge_type}'] = score
         
         report_list.append(row)
     
-    # Create DataFrame
+    # Create DataFrame and sort by model_name and preprocessing_steps
     df = pd.DataFrame(report_list)
+    df = df.sort_values(['model_name', 'preprocessing_steps'])
     
-    # Save to CSV file
-    results_dir = 'results'
+    # Save to CSV
+    results_dir = Path('results')
+    results_dir.mkdir(exist_ok=True)
+    
     today = time.strftime('%Y%m%d')
     next_num = get_next_report_number()
-    report_filepath = os.path.join(results_dir, f"{today}_performance_report_{next_num}.csv")
-    df.to_csv(report_filepath, index=False, encoding='utf-8')
+    filename = f"{today}_performance_report_{next_num}.csv"
+    filepath = results_dir / filename
     
-    print(f"Performance report saved to {report_filepath}")
-
+    df.to_csv(filepath, index=False)
+    print(f"Performance report saved to {filepath}")
+    
     return df 

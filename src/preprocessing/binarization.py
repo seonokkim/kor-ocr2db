@@ -9,14 +9,14 @@ class BinarizationPreprocessor(BasePreprocessor):
         self.c = c
     
     def process(self, image: np.ndarray) -> np.ndarray:
-        """이진화를 적용합니다."""
-        # 그레이스케일 변환
+        """Apply binarization."""
+        # Convert to grayscale
         if len(image.shape) == 3:
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         else:
             gray = image
             
-        # 이진화 방법 선택
+        # Select binarization method
         if self.method == 'adaptive':
             binary = cv2.adaptiveThreshold(
                 gray,
@@ -29,7 +29,7 @@ class BinarizationPreprocessor(BasePreprocessor):
         else:  # otsu
             _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         
-        # 원본 형식으로 변환
+        # Convert back to original format
         if len(image.shape) == 3:
             return cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
         return binary 
