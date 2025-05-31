@@ -1,0 +1,43 @@
+{
+    "config": {
+        "config_name": "20250531_base_tesseract_sharpening_binarization",
+        "model_name": "base_tesseract",
+        "preprocessing_steps": [
+            "sharpening",
+            "binarization"
+        ],
+        "use_gpu": true,
+        "timestamp": "20250531"
+    },
+    "metrics": {
+        "item_accuracy": 0.0,
+        "char_accuracy": 0.0,
+        "inference_time": 1.3974804878234863,
+        "type_accuracies": {},
+        "region_accuracies": {},
+        "length_accuracies": {},
+        "size_accuracies": {},
+        "text_similarity": {
+            "normalized_levenshtein": -0.27857142857142847,
+            "rouge_scores": {
+                "rouge-1": 0.1562499950109865,
+                "rouge-2": 0.01449274863264192,
+                "rouge-l": 0.0937499950109866
+            },
+            "bleu_score": 0.03243877838498814
+        }
+    },
+    "predictions": [
+        [
+            [
+                "4316\n\n년                                                           띠\n\n1\"                                   {\n\n  \n \n\n솜(0525) 36-1978\n\n41\n\n저\n[때\n\n61-1 /전화(0525) .32-6360 /\n\n축공사 준궁계가 제출되어\n\n과 시\n~    느\n\n!\"!\n\n지회\n\n고삐\n10\n\n]\n\n \n\n노\n10\n\n진\n임\n을\n지방건축주사보\n\n\"|\n\n발\n|\n[\n\n내\n\n0 700\n\n00\n\n「          제\n4]\n\n저\n\n흥13600-\n재\n\n1]                                   ~\n\n`93 지역개\n글\n\n내 부\n글\n\n도시과\n\n에 권 버         메           00\n\n80 4           =             는\n\n시행일자 94.01,",
+                [
+                    0.0,
+                    0.0,
+                    2476.0,
+                    3508.0
+                ]
+            ]
+        ]
+    ]
+}

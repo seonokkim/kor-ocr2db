@@ -1,9 +1,8 @@
 {
     "config": {
-        "config_name": "20250531_base_easyocr_sharpening_denoising",
+        "config_name": "20250531_base_easyocr_denoising",
         "model_name": "base_easyocr",
         "preprocessing_steps": [
-            "sharpening",
             "denoising"
         ],
         "use_gpu": true,
@@ -11,30 +10,30 @@
     },
     "metrics": {
         "item_accuracy": 0.527027027027027,
-        "char_accuracy": 0.7063492063492064,
-        "inference_time": 6.169890642166138,
+        "char_accuracy": 0.6984126984126984,
+        "inference_time": 2.5011725425720215,
         "type_accuracies": {
-            "textType1": 0.717948717948718
+            "textType1": 0.6923076923076923
         },
         "region_accuracies": {
-            "bottom": 0.717948717948718
+            "bottom": 0.6923076923076923
         },
         "length_accuracies": {
-            "short": 0.8421052631578947,
+            "short": 0.7894736842105263,
             "long": 0.42857142857142855,
             "medium": 0.6923076923076923
         },
         "size_accuracies": {
-            "medium": 0.717948717948718
+            "medium": 0.6923076923076923
         },
         "text_similarity": {
-            "normalized_levenshtein": 0.7285714285714286,
+            "normalized_levenshtein": 0.725,
             "rouge_scores": {
-                "rouge-1": 0.6423357614257552,
-                "rouge-2": 0.30136985801463695,
-                "rouge-l": 0.6131386811337844
+                "rouge-1": 0.6376811544244907,
+                "rouge-2": 0.28571428071636823,
+                "rouge-l": 0.6086956471781139
             },
-            "bleu_score": 0.3613493715029804
+            "bleu_score": 0.3521157379621322
         }
     },
     "predictions": [
@@ -42,7 +41,7 @@
             [
                 "김",
                 [
-                    767.0,
+                    765.0,
                     345.0,
                     840.0,
                     405.0
@@ -258,10 +257,10 @@
             [
                 "장 |",
                 [
-                    1277.0,
-                    893.0,
-                    1391.0,
-                    955.0
+                    1281.0,
+                    897.0,
+                    1390.0,
+                    954.0
                 ]
             ],
             [
@@ -472,9 +471,9 @@
                 ]
             ],
             [
-                "김",
+                "\"",
                 [
-                    563.0,
+                    560.0,
                     3098.0,
                     628.0,
                     3152.0

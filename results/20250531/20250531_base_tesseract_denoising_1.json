@@ -1,0 +1,42 @@
+{
+    "config": {
+        "config_name": "20250531_base_tesseract_denoising",
+        "model_name": "base_tesseract",
+        "preprocessing_steps": [
+            "denoising"
+        ],
+        "use_gpu": true,
+        "timestamp": "20250531"
+    },
+    "metrics": {
+        "item_accuracy": 0.0,
+        "char_accuracy": 0.0,
+        "inference_time": 9.169899463653564,
+        "type_accuracies": {},
+        "region_accuracies": {},
+        "length_accuracies": {},
+        "size_accuracies": {},
+        "text_similarity": {
+            "normalized_levenshtein": -2.085714285714286,
+            "rouge_scores": {
+                "rouge-1": 0.03260869102138535,
+                "rouge-2": 0.0,
+                "rouge-l": 0.03260869102138535
+            },
+            "bleu_score": 0.004456569635838846
+        }
+    },
+    "predictions": [
+        [
+            [
+                "| 동                      ㅇ\n2 벼    ㅣ ㅣ ㅣ ：               1\n엄          | 이    1801 | 빼               .\n1          |    | | |\n은          | ㅎ   1 | |\n사          | 쥬    15 | |                +\n녁          | ㅁㅁ 가 기\n=          |    | |\n핀          | 줌    |\n도          | 많   | | |\n=          ㅣ     1] ㅣ ㅣ\n=          ㅣ =    | 80 」 ㅣ\n우          | 전    | 이\n64          | 펴    1 20 | ｌ\n        를 01 | |             |\n녹          | ~ ㆍ  | ㅣ ㅣ\n8 의          | _포 암  ㅣ | |\n은  그  ㄱㄱ\n가          | ㅁ2. 그  ㅣ ㅣ ㅣ\n리         로로 | |\n러          | 콘돔 | 이펄|\n0          | 회 법  | |춘\n쩌          ! 기 ㅁ00  ㅣ | 짜 ㅣ\n 쑤 0  120 1\\ |                ㅜ\n버          | 듀라                0\n가   ~      | 병원 | |필|\n-         지| 해 발  | 1 |\n또           기 오보로 가니\n0   ~      20 팸 조조 | |\n룸     | 흐 때 때 그 |\n30   ;                _\n0   걱  페   뻐 | 호 \" 0 | 6 | 므 |                자\n분   나  가   때! 요 ㅎ  [41 이\n읍   오      미우 월? | 니버!\n우   녹 그   비  테  | ㅣ |\n덤   010         4  는 0 그\n@   20 야 4 쪼  0   00\n아   구 0 + 27  굴   따",
+                [
+                    0.0,
+                    0.0,
+                    2476.0,
+                    3508.0
+                ]
+            ]
+        ]
+    ]
+}

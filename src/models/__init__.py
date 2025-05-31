@@ -1,9 +1,13 @@
 from .base import BaseOCRModel
 from .easyocr import EasyOCRModel
+from .yolo_ocr import YOLOOCRModel
+from .tesseract import TesseractModel
 
 __all__ = [
     'BaseOCRModel',
     'EasyOCRModel',
+    'YOLOOCRModel',
+    'TesseractModel',
 ]
 
 # PaddleOCR model is loaded optionally

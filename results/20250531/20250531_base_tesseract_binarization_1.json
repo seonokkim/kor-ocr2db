@@ -1,0 +1,42 @@
+{
+    "config": {
+        "config_name": "20250531_base_tesseract_binarization",
+        "model_name": "base_tesseract",
+        "preprocessing_steps": [
+            "binarization"
+        ],
+        "use_gpu": true,
+        "timestamp": "20250531"
+    },
+    "metrics": {
+        "item_accuracy": 0.0,
+        "char_accuracy": 0.0,
+        "inference_time": 2.2911171913146973,
+        "type_accuracies": {},
+        "region_accuracies": {},
+        "length_accuracies": {},
+        "size_accuracies": {},
+        "text_similarity": {
+            "normalized_levenshtein": -2.8892857142857142,
+            "rouge_scores": {
+                "rouge-1": 0.033898300379840415,
+                "rouge-2": 0.0,
+                "rouge-l": 0.033898300379840415
+            },
+            "bleu_score": 0.0042539623924011845
+        }
+    },
+    "predictions": [
+        [
+            [
+                "「                                 이 이\n| 8    000                 노\n론          | 별    | | | 글               ~\n           | 을 101 | 빼\n이  옹                      )   :        ㅣ   |   |\n) =     ㅣ  |  '\n|\"! =            | 들    [| |                   “\n3              1     132 !  '\n녹          | 0    | | |\n~              | 4     ㅣ  |  |\n<0                | 슷      | 그 그\n              | 멘     | | |\n=              ㅣ       ㅣ |  ㅣ\nㅇ              |     | 6901 1\n우              | 고     | | 이\n0              | 더     1 30 |  ㅣ\n=          | 이    | | |                |!\n고 원             | 토고   | | |                    |\n1              | 꼬 나   ㅣ  1  ㅣ\n0 으             | 필코 더\n히          | 할은 | | |\n           | 코르 | 의피|\n0           | 회 법   | |친\n렁              | 위 ㅁ0   ㅣ  1 사 |\n| =   | 126!\nㅣ   00   | 464 1 때 |                     =\n1    _         | 퍼 외   | 201\n가   |        하| 일 다 00 |\nㅠㅠ            1 | 21  ;   |  ㅣ  1\n메조            기 주 보치 는 그그\n    누        0 풀즈조 | | |\n|        른    이 호재 제 | | |\n*      \"         99 6 00640 0 16!더|                                        -\n3 띠    국| 6 또 별 | [후\n> 고    0 은 을 ㅎㅇ |저태|\n는   족      41 |    때    | | 그\n해 0     때    대   ㄴㄴ 그\n20 야 긴 버    00\n그 00 +   내    1",
+                [
+                    0.0,
+                    0.0,
+                    2476.0,
+                    3508.0
+                ]
+            ]
+        ]
+    ]
+}

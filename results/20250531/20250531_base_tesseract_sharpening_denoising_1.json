@@ -1,0 +1,43 @@
+{
+    "config": {
+        "config_name": "20250531_base_tesseract_sharpening_denoising",
+        "model_name": "base_tesseract",
+        "preprocessing_steps": [
+            "sharpening",
+            "denoising"
+        ],
+        "use_gpu": true,
+        "timestamp": "20250531"
+    },
+    "metrics": {
+        "item_accuracy": 0.0,
+        "char_accuracy": 0.0,
+        "inference_time": 9.203690767288208,
+        "type_accuracies": {},
+        "region_accuracies": {},
+        "length_accuracies": {},
+        "size_accuracies": {},
+        "text_similarity": {
+            "normalized_levenshtein": -2.1785714285714284,
+            "rouge_scores": {
+                "rouge-1": 0.0529100483334737,
+                "rouge-2": 0.0,
+                "rouge-l": 0.0529100483334737
+            },
+            "bleu_score": 0.006720336928431085
+        }
+    },
+    "predictions": [
+        [
+            [
+                "| 동                      ㅇ\n2 벼    ㅣ ㅣ ㅣ ：               1\n업          | 의    1801 | 뽀               .\n1          |    | | |\n|          | ㅎ   1 | |\n사          | 쥬    [5 | |                +\n녁          | ㅁㅁ 가 기\n=          | 비    | |\n핀          | 줌    ~”\n도          | 많   | | |\n[0          ㅣ     1] ㅣ ㅣ\n=          ㅣ =    | 800 」 ㅣ\n우          | 전    | 이\n64          | 펴    | 20 | ｌ\n        를 01 | |             |\n나          | ~ ㆍ  | ㅣ ㅣ\n8 의          | 포 남  ㅣ | |\n은  그  ㄱㄱ\n가          | ㅁ2. 그  ㅣ ㅣ ㅣ\n리         로로 | |\n러          | 콘돔 | 이펄|\n0          | 회 법  | |춘\n어          ! 김 ㅁ00  ㅣ | 짜 |\n 섯 권  120 1\\ |                ㅜ\n배          | 8 | 그리                0\n가   ~      | 병원 | |필|\n-         지| 해 발  | | |\n또           기 오보로 가니\n0   ~      20 팸 초조 | |\n룸     | 흐 때 빠 그 2 |\n30   ;              0                _\n0   컴  페   뻐 | 흐 \" 0 | 6 | 므 |                개\n분   나  과   때! 요 ㅎ  [41 이\n읍   오      0 후 월? | 이버!\n우   녹 그   비  테  | ㅣ |\n덤   010         더  는 0 그\n@   20 야 4 쪼  0   00\n아   구 0 4 27  굴   1",
+                [
+                    0.0,
+                    0.0,
+                    2476.0,
+                    3508.0
+                ]
+            ]
+        ]
+    ]
+}

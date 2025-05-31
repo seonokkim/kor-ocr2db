@@ -1,10 +1,11 @@
 {
     "config": {
-        "config_name": "20250531_base_easyocr_sharpening_denoising",
+        "config_name": "20250531_base_easyocr_sharpening_denoising_binarization",
         "model_name": "base_easyocr",
         "preprocessing_steps": [
             "sharpening",
-            "denoising"
+            "denoising",
+            "binarization"
         ],
         "use_gpu": true,
         "timestamp": "20250531"
@@ -12,7 +13,7 @@
     "metrics": {
         "item_accuracy": 0.527027027027027,
         "char_accuracy": 0.7063492063492064,
-        "inference_time": 6.169890642166138,
+        "inference_time": 2.5736186504364014,
         "type_accuracies": {
             "textType1": 0.717948717948718
         },
@@ -42,7 +43,7 @@
             [
                 "김",
                 [
-                    767.0,
+                    765.0,
                     345.0,
                     840.0,
                     405.0
@@ -98,7 +99,7 @@
                 [
                     1037.0,
                     450.0,
-                    1146.0,
+                    1144.0,
                     500.0
                 ]
             ],
@@ -258,10 +259,10 @@
             [
                 "장 |",
                 [
-                    1277.0,
-                    893.0,
-                    1391.0,
-                    955.0
+                    1281.0,
+                    897.0,
+                    1390.0,
+                    954.0
                 ]
             ],
             [
@@ -474,7 +475,7 @@
             [
                 "김",
                 [
-                    563.0,
+                    560.0,
                     3098.0,
                     628.0,
                     3152.0

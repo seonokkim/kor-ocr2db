@@ -12,12 +12,12 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 # Attempt to import PaddleOCR module
 try:
-    from models import EasyOCRModel, PaddleOCRModel
+    from models import EasyOCRModel, PaddleOCRModel, YOLOOCRModel
     PADDLEOCR_AVAILABLE = True
 except ImportError as e:
     print(f"\nWarning: Could not import PaddleOCR module - {str(e)}")
     print("PaddleOCR model will be excluded from evaluation.")
-    from models import EasyOCRModel
+    from models import EasyOCRModel, YOLOOCRModel
     PADDLEOCR_AVAILABLE = False
 
 from preprocessing import (
@@ -31,6 +31,7 @@ from utils.evaluation_utils import (
     load_all_results,
     generate_performance_report
 )
+from models import YOLOOCRModel, TesseractModel
 
 def bbox_iou(boxA, boxB):
     """Compute the Intersection over Union (IoU) of two bounding boxes.
@@ -331,38 +332,15 @@ def main():
     test_images, ground_truth = load_test_data(config)
     print(f"Loaded {len(test_images)} test images.")
     
-    # Trained models directory
-    trained_model_dir = "trained_models"
-
-    # Initialize models
+    # Initialize only Tesseract and PaddleOCR models
     evaluation_targets = {
-        'base_easyocr': EasyOCRModel(),
+        'base_tesseract': TesseractModel(),
     }
     
+    # Add PaddleOCR if available
     if PADDLEOCR_AVAILABLE:
         evaluation_targets['base_paddleocr'] = PaddleOCRModel()
     
-    # Add other base models (if needed)
-
-    # 2. Add trained models (if they exist)
-    # Check for learnable models defined in config and attempt to load trained models
-    learnable_models = ['tesseract', 'paddleocr'] # List of models supporting user training
-    for model_name in learnable_models:
-        trained_model_path = os.path.join(trained_model_dir, f'{model_name}_korean')
-        # Check if trained model file (e.g., pytorch model file) exists
-        # Needs to be adjusted according to the actual model file extension and structure
-        if os.path.exists(trained_model_path): # Check if trained model directory or file exists
-             try:
-                 # TODO: Implement trained model loading logic
-                 # Example: if model_name == 'tesseract': loaded_model = TesseractModel(model_path=trained_model_path)
-                 # Example: elif model_name == 'paddleocr': loaded_model = PaddleOCRModel(model_path=trained_model_path)
-                 print(f"\nWarning: Loading trained {model_name} model is not yet implemented.")
-                 # evaluation_targets[f'trained_{model_name}'] = loaded_model
-             except Exception as e:
-                 print(f"Warning: Failed to load trained {model_name} model from {trained_model_path}: {e}")
-        else:
-            print(f"Info: Trained {model_name} model not found at {trained_model_path}. Skipping evaluation for this model.")
-
     if not evaluation_targets:
         print("No models available for evaluation. Exiting script.")
         return
@@ -387,7 +365,7 @@ def main():
             
             # Create evaluation config
             eval_config = create_evaluation_config(
-                model_name=target_name, # Include base/trained info in model name
+                model_name=target_name,
                 preprocessing_steps=preprocess_steps,
                 use_gpu=config['hardware']['use_gpu']
             )

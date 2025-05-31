@@ -1,0 +1,40 @@
+{
+    "config": {
+        "config_name": "20250531_base_tesseract_no_preprocess",
+        "model_name": "base_tesseract",
+        "preprocessing_steps": [],
+        "use_gpu": true,
+        "timestamp": "20250531"
+    },
+    "metrics": {
+        "item_accuracy": 0.0,
+        "char_accuracy": 0.0,
+        "inference_time": 2.3043179512023926,
+        "type_accuracies": {},
+        "region_accuracies": {},
+        "length_accuracies": {},
+        "size_accuracies": {},
+        "text_similarity": {
+            "normalized_levenshtein": -2.1392857142857142,
+            "rouge_scores": {
+                "rouge-1": 0.010582006005432958,
+                "rouge-2": 0.0,
+                "rouge-l": 0.010582006005432958
+            },
+            "bleu_score": 0.00319554291471707
+        }
+    },
+    "predictions": [
+        [
+            [
+                "| 동                      ㅇ\n2 벼    ㅣ ㅣ ㅣ ;               1\n업          | 씨    1801 | 뽀               .\n\"          | 본    | | |\n|          | ㅎ   1 | |\n스          |    15 | |                +\n녁          | ㅁㅁ 가 기\n=          |    | |\n핀          | 중    ~”\n도          | 많   | | |\n|          ㅣ     1] ㅣ ㅣ\n=          ㅣ =    | 800 」 ㅣ\n우          | 전    | 이\n64          | 펴    1 20 | ｌ\n        를 001 | |             |\n나          | ~ ㆍ  | ㅣ ㅣ\n8 의          | 포가  ㅣ | |\n은  그  ㄱㄱ\n가          | ㅁ2. 그  ㅣ ㅣ ㅣ\n리         | 로로 | |\n러          | 코롤 | 이펼|\n0          | 회 법  | |준\n렁          ! 휘 ㅁ00  ㅣ | 짜 ㅣ\n. 섯 권  120 1\\ |                ㅜ\n버          | 듀라                0\n가   ~      | 병원 | |필|\n-         지 갤 밤  | | |\n또           기 오보로 가니\n0   ~      20 팸 초초 | |\n룸     | 흐 때 빠 들 |\n30   ;              0                _\n0   커  페   뻐 | 호 초 0 | 6 | 므 |                자\n분   나  가   때! 요 ㅎ  141 이\n읍   오      미우 월? | 이버!\n우   복고   비  | ㅣ |\n덤   010         더  는 0 그\n@   20 야 4 쪼  0   00\n아   구 0 + 27  굴   따",
+                [
+                    0.0,
+                    0.0,
+                    2476.0,
+                    3508.0
+                ]
+            ]
+        ]
+    ]
+}

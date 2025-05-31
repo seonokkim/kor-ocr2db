@@ -1,18 +1,15 @@
 {
     "config": {
-        "config_name": "20250531_base_easyocr_sharpening_denoising",
+        "config_name": "20250531_base_easyocr_no_preprocess",
         "model_name": "base_easyocr",
-        "preprocessing_steps": [
-            "sharpening",
-            "denoising"
-        ],
+        "preprocessing_steps": [],
         "use_gpu": true,
         "timestamp": "20250531"
     },
     "metrics": {
         "item_accuracy": 0.527027027027027,
         "char_accuracy": 0.7063492063492064,
-        "inference_time": 6.169890642166138,
+        "inference_time": 2.455364227294922,
         "type_accuracies": {
             "textType1": 0.717948717948718
         },
@@ -28,13 +25,13 @@
             "medium": 0.717948717948718
         },
         "text_similarity": {
-            "normalized_levenshtein": 0.7285714285714286,
+            "normalized_levenshtein": 0.7321428571428572,
             "rouge_scores": {
-                "rouge-1": 0.6423357614257552,
-                "rouge-2": 0.30136985801463695,
-                "rouge-l": 0.6131386811337844
+                "rouge-1": 0.6569343015717407,
+                "rouge-2": 0.3287671182886096,
+                "rouge-l": 0.6277372212797699
             },
-            "bleu_score": 0.3613493715029804
+            "bleu_score": 0.37867943562666473
         }
     },
     "predictions": [
@@ -51,8 +48,8 @@
             [
                 "해",
                 [
-                    1311.0,
-                    349.0,
+                    1308.0,
+                    346.0,
                     1393.0,
                     398.0
                 ]
@@ -148,10 +145,10 @@
                 ]
             ],
             [
-                "진용 13600-",
+                "진흥 13600-",
                 [
-                    512.0,
-                    600.0,
+                    510.0,
+                    597.0,
                     775.0,
                     660.0
                 ]
@@ -405,7 +402,7 @@
                     559.0,
                     1444.0,
                     1413.0,
-                    1509.0
+                    1511.0
                 ]
             ],
             [

@@ -1,0 +1,33 @@
+{
+    "config": {
+        "config_name": "20250531_base_paddleocr_denoising_binarization",
+        "model_name": "base_paddleocr",
+        "preprocessing_steps": [
+            "denoising",
+            "binarization"
+        ],
+        "use_gpu": true,
+        "timestamp": "20250531"
+    },
+    "metrics": {
+        "item_accuracy": 0.0,
+        "char_accuracy": 0.0,
+        "inference_time": 16.59300470352173,
+        "type_accuracies": {},
+        "region_accuracies": {},
+        "length_accuracies": {},
+        "size_accuracies": {},
+        "text_similarity": {
+            "normalized_levenshtein": 0.0,
+            "rouge_scores": {
+                "rouge-1": 0.0,
+                "rouge-2": 0.0,
+                "rouge-l": 0.0
+            },
+            "bleu_score": 0.0
+        }
+    },
+    "predictions": [
+        []
+    ]
+}
