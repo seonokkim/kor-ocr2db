@@ -80,6 +80,7 @@ def load_test_data(config: Dict[str, Any]) -> tuple:
     
     data_dir = config['data']['test_dir']
     label_dir = config['data']['label_dir']
+    test_data_limit = config['evaluation']['test_data_limit']
 
     # Match images and label files (explore subfolders)
     for root, _, files in os.walk(Path(data_dir) / 'images'): # Explore from images/ subfolder
@@ -87,14 +88,11 @@ def load_test_data(config: Dict[str, Any]) -> tuple:
             if file.endswith('.jpg'):
                 img_path = Path(root) / file
                 
-                # Relative path of the image file based on images/
-                relative_img_sub_path = img_path.relative_to(Path(data_dir) / 'images')
+                # Get relative path from images/5350224/
+                relative_img_path = img_path.relative_to(Path(data_dir) / 'images' / '5350224')
                 
-                # Label file path (based on label_dir)
-                json_path = Path(label_dir) / 'labels' / relative_img_sub_path.parent / relative_img_sub_path.name.replace('.jpg', '.json')
-
-                # Debug print for label file path
-                # print(f"Checking test label path: {json_path}")
+                # Construct corresponding label path
+                json_path = Path(label_dir) / 'labels' / '5350224' / relative_img_path.parent / file.replace('.jpg', '.json')
 
                 if json_path.exists():
                     img = cv2.imread(str(img_path))
@@ -105,6 +103,10 @@ def load_test_data(config: Dict[str, Any]) -> tuple:
                         # Store list of all annotations
                         ground_truth_annotations.append(label_data.get('annotations', []))
                         images.append(img)
+                        
+                        # Check if we've reached the limit
+                        if test_data_limit > 0 and len(images) >= test_data_limit:
+                            return images, ground_truth_annotations
                     else:
                         print(f"Warning: Could not load image {img_path}")
                 else:

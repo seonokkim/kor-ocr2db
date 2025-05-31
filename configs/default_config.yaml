@@ -30,6 +30,7 @@ evaluation:
   save_results: true
   results_dir: "results"
   save_visualizations: true
+  test_data_limit: 1  # Process only one test data
 
 # Data Configuration
 data:

@@ -217,18 +217,60 @@ def generate_performance_report(all_results: Dict[str, Any]) -> pd.DataFrame:
     """
     report_list = []
     
+    # Define mapping from model_name to 근본 모델(method)
+    model_method_map = {
+        'base_easyocr': {
+            'text_detection': 'CRAFT',
+            'text_recognition': 'CRNN (CNN + BiLSTM + CTC)'
+        },
+        'easyocr': {
+            'text_detection': 'CRAFT',
+            'text_recognition': 'CRNN (CNN + BiLSTM + CTC)'
+        },
+        'base_paddleocr': {
+            'text_detection': 'DBNet/EAST',
+            'text_recognition': 'CRNN/SVTR'
+        },
+        'paddleocr': {
+            'text_detection': 'DBNet/EAST',
+            'text_recognition': 'CRNN/SVTR'
+        },
+        'base_tesseract': {
+            'text_detection': 'Layout Analysis',
+            'text_recognition': 'LSTM + CTC'
+        },
+        'tesseract': {
+            'text_detection': 'Layout Analysis',
+            'text_recognition': 'LSTM + CTC'
+        },
+        'base_yolo_ocr': {
+            'text_detection': 'YOLOv5/YOLOv8',
+            'text_recognition': 'External OCR'
+        },
+        'yolo_ocr': {
+            'text_detection': 'YOLOv5/YOLOv8',
+            'text_recognition': 'External OCR'
+        }
+    }
+    
     for config_key, result_data in all_results.items():
         config = result_data['config']
         metrics = result_data['metrics']
         
         # Extract base model information from model_name
         model_name = config['model_name']
-        if model_name.startswith('base_'):
-            base_model = model_name.split('_')[1]  # Get the actual model name after 'base_'
-            model_name = f"base_{base_model} ({base_model})"  # Add base model info in parentheses
+        method_info = model_method_map.get(model_name, {'text_detection': model_name, 'text_recognition': model_name})
+        if model_name == "base_easyocr":
+            model_name_out = "easyocr"
+        elif model_name.startswith('base_'):
+            model_name_out = model_name.split('_', 1)[1]
+        else:
+            model_name_out = model_name
         
         row = {
-            'model_name': model_name,
+            'model_name': model_name_out,
+            'text_detection': method_info['text_detection'],
+            'text_recognition': method_info['text_recognition'],
             'preprocessing_steps': "_".join(config['preprocessing_steps']) if config['preprocessing_steps'] else 'no_preprocessing',
             'item_accuracy': metrics.get('item_accuracy', 0),
             'char_accuracy': metrics.get('char_accuracy', 0),
