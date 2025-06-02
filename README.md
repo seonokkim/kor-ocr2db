@@ -7,8 +7,8 @@ This repository provides a comprehensive framework for evaluating the performanc
 - Support for multiple OCR models:
   - EasyOCR
   - PaddleOCR (Optional - requires successful installation)
-  - Tesseract (Planned)
-  - YOLO-based OCR (Planned)
+  - Tesseract
+  - YOLO-based OCR
 
 - Modular image preprocessing steps:
   - Sharpening
@@ -33,8 +33,8 @@ This repository provides a comprehensive framework for evaluating the performanc
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/seonokkim/kor-ocr-rag
-   cd kor-ocr-rag
+   git clone https://github.com/seonokkim/kor-ocr2db.git
+   cd kor-ocr2db
    ```
 
 2. Create and activate a virtual environment:
@@ -63,20 +63,26 @@ This repository provides a comprehensive framework for evaluating the performanc
    ```
    This will perform the evaluation based on your configuration, save detailed results as JSON files with sequential numbering, and generate a performance report CSV file with sequential numbering in the `results/` directory.
 
+4. (Optional) To train models that support training (e.g., Tesseract, PaddleOCR):
+   ```bash
+   python src/train.py
+   ```
+
 ## Project Structure
 
 ```
-kor-ocr-rag/
+kor-ocr2db/
 ├── data/                      # Data folder (images, labels)
 ├── src/
-│   ├── models/               # OCR model implementations
+│   ├── models/               # OCR model implementations (EasyOCR, PaddleOCR, Tesseract, YOLO-based)
 │   ├── preprocessing/        # Image preprocessing modules
-│   ├── evaluation/          # Performance evaluation module
-│   └── utils/               # Utility functions
-├── tests/                   # Test code
-├── configs/                 # Configuration files
-├── results/                 # Experiment results and reports
-└── requirements.txt         # Dependency packages
+│   ├── evaluation/           # Performance evaluation module
+│   ├── utils/                # Utility functions
+│   └── train.py              # Training script
+├── configs/                  # Configuration files
+├── results/                  # Experiment results and reports
+├── requirements.txt          # Dependency packages
+└── README.md                 # Project documentation
 ```
 
 ## License
