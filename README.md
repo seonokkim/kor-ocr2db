@@ -9,6 +9,7 @@ This repository provides a comprehensive framework for evaluating the performanc
   - PaddleOCR (Optional - requires successful installation)
   - Tesseract
   - YOLO-based OCR
+  - Azure Document Intelligence (with three modes: read, layout, prebuilt_read)
 
 - Modular image preprocessing steps:
   - Sharpening
@@ -39,8 +40,8 @@ This repository provides a comprehensive framework for evaluating the performanc
 
 2. Create and activate a virtual environment:
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate
+   python -m venv .venv38
+   source .venv38/bin/activate
    ```
 
 3. Install dependencies:
@@ -48,6 +49,13 @@ This repository provides a comprehensive framework for evaluating the performanc
    pip install -r requirements.txt
    ```
    *Note: PaddleOCR installation can sometimes be tricky due to dependencies. If you encounter issues, the script is designed to skip PaddleOCR evaluation if the module is not available.*
+
+4. (Optional) Set up Azure Document Intelligence:
+   Create a `.env` file in the project root with your Azure credentials:
+   ```
+   AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT=your_endpoint_url
+   AZURE_DOCUMENT_INTELLIGENCE_KEY=your_api_key
+   ```
 
 ## Usage
 
@@ -74,7 +82,13 @@ This repository provides a comprehensive framework for evaluating the performanc
 kor-ocr2db/
 ├── data/                      # Data folder (images, labels)
 ├── src/
-│   ├── models/               # OCR model implementations (EasyOCR, PaddleOCR, Tesseract, YOLO-based)
+│   ├── models/               # OCR model implementations
+│   │   ├── base.py          # Base model class
+│   │   ├── easyocr.py       # EasyOCR implementation
+│   │   ├── paddleocr.py     # PaddleOCR implementation
+│   │   ├── tesseract.py     # Tesseract implementation
+│   │   ├── yolo_ocr.py      # YOLO-based OCR implementation
+│   │   └── azure_document_intelligence.py  # Azure Document Intelligence implementation
 │   ├── preprocessing/        # Image preprocessing modules
 │   ├── evaluation/           # Performance evaluation module
 │   ├── utils/                # Utility functions
