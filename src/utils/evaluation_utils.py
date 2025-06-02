@@ -32,11 +32,11 @@ def create_evaluation_config() -> Dict[str, Any]:
         'data': {
             'test_dir': 'data/test',
             'label_dir': 'data/test',
-            'test_data_limit': 0  # 0 means no limit
+            'test_data_limit': 1  # Limit to 1 test sample
         },
         'evaluation': {
             'iou_threshold': 0.5,
-            'test_data_limit': 0
+            'test_data_limit': 1
         },
         'hardware': {
             'use_gpu': True
