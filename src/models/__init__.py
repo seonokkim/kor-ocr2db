@@ -20,5 +20,15 @@ except ImportError as e:
     print("PaddleOCR model will be excluded from evaluation.")
     PADDLEOCR_AVAILABLE = False
 
+# Azure Document Intelligence model is loaded optionally
+try:
+    from .azure_document_intelligence import AzureDocumentIntelligenceModel
+    __all__.append('AzureDocumentIntelligenceModel')
+    AZURE_AVAILABLE = True
+except ImportError as e:
+    print(f"\nWarning: Could not load AzureDocumentIntelligenceModel - {str(e)}")
+    print("AzureDocumentIntelligenceModel will be excluded from evaluation.")
+    AZURE_AVAILABLE = False
+
 # 모델 로더 함수 등 필요한 유틸리티 임포트
 # from .model_loader import load_model

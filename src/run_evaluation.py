@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 import time
 import yaml
 from pathlib import Path
@@ -12,13 +15,15 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 # Attempt to import PaddleOCR module
 try:
-    from models import EasyOCRModel, PaddleOCRModel, YOLOOCRModel
+    from models import EasyOCRModel, PaddleOCRModel, YOLOOCRModel, AzureDocumentIntelligenceModel
     PADDLEOCR_AVAILABLE = True
+    AZURE_AVAILABLE = True
 except ImportError as e:
-    print(f"\nWarning: Could not import PaddleOCR module - {str(e)}")
-    print("PaddleOCR model will be excluded from evaluation.")
+    print(f"\nWarning: Could not import some modules - {str(e)}")
+    print("Some models will be excluded from evaluation.")
     from models import EasyOCRModel, YOLOOCRModel
     PADDLEOCR_AVAILABLE = False
+    AZURE_AVAILABLE = False
 
 from preprocessing import (
     SharpeningPreprocessor,
@@ -325,27 +330,31 @@ def evaluate_combination(
 
 def main():
     # Load configuration
-    with open("configs/default_config.yaml", 'r') as f:
-        config = yaml.safe_load(f)
+    config = create_evaluation_config()
     
-    # Load test data
-    test_images, ground_truth = load_test_data(config)
-    print(f"Loaded {len(test_images)} test images.")
-    
-    # Initialize only Tesseract and PaddleOCR models
-    evaluation_targets = {
-        'base_tesseract': TesseractModel(),
+    # Initialize models
+    models = {
+        'tesseract': TesseractModel(),
+        'easyocr': EasyOCRModel(),
+        'yolo': YOLOOCRModel()
     }
     
-    # Add PaddleOCR if available
     if PADDLEOCR_AVAILABLE:
-        evaluation_targets['base_paddleocr'] = PaddleOCRModel()
+        models['paddleocr'] = PaddleOCRModel()
     
-    if not evaluation_targets:
-        print("No models available for evaluation. Exiting script.")
-        return
+    if AZURE_AVAILABLE:
+        try:
+            models['azure'] = AzureDocumentIntelligenceModel()
+        except ValueError as e:
+            print(f"\nWarning: Azure Document Intelligence not configured - {str(e)}")
+            print("Azure Document Intelligence will be excluded from evaluation.")
     
-    # Generate preprocessing combinations
+    # Load test data
+    print("\nLoading test data...")
+    images, ground_truth = load_test_data(config)
+    print(f"Loaded {len(images)} test images")
+    
+    # Define preprocessing combinations
     preprocessing_combinations = [
         [],  # No preprocessing
         ['sharpening'],
@@ -357,40 +366,29 @@ def main():
         ['sharpening', 'denoising', 'binarization']
     ]
     
-    # Perform evaluation for all model and preprocessing combinations
-    for target_name, model in evaluation_targets.items():
-        print(f"\nEvaluating model: {target_name}")
-        for preprocess_steps in preprocessing_combinations:
-            print(f"Preprocessing steps: {preprocess_steps if preprocess_steps else 'None'}")
+    # Run evaluation for each model and preprocessing combination
+    results = {}
+    for model_name, model in models.items():
+        print(f"\nEvaluating {model_name}...")
+        model_results = {}
+        
+        for preproc_steps in preprocessing_combinations:
+            preproc_name = '+'.join(preproc_steps) if preproc_steps else 'none'
+            print(f"  With preprocessing: {preproc_name}")
             
-            # Create evaluation config
-            eval_config = create_evaluation_config(
-                model_name=target_name,
-                preprocessing_steps=preprocess_steps,
-                use_gpu=config['hardware']['use_gpu']
-            )
+            result = evaluate_combination(model, images, ground_truth, preproc_steps)
+            model_results[preproc_name] = result
             
-            # Perform evaluation
-            results = evaluate_combination(
-                model=model,
-                images=test_images,
-                ground_truth=ground_truth,
-                preprocessing_steps=preprocess_steps
-            )
-            
-            # Save results
-            save_evaluation_results(results, eval_config)
-            
-            # Print intermediate results
-            print(f"Item Accuracy: {results['metrics']['item_accuracy']:.4f}")
-            print(f"Character Accuracy: {results['metrics']['char_accuracy']:.4f}")
-            print(f"Inference Time: {results['metrics']['inference_time']:.2f} seconds")
+        results[model_name] = model_results
     
-    # Analyze overall results and generate report
-    print("\nAnalyzing overall results...")
-    all_results = load_all_results()
-    report = generate_performance_report(all_results)
-    print("Evaluation complete! Results can be found in the results directory.")
+    # Save results
+    save_evaluation_results(results, config)
+    
+    # Generate and print performance report
+    print("\nGenerating performance report...")
+    report = generate_performance_report(results)
+    print("\nPerformance Report:")
+    print(report)
 
 if __name__ == "__main__":
     main() 

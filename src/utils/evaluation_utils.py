@@ -26,40 +26,22 @@ def convert_numpy_types(obj):
     else:
         return obj
 
-def create_evaluation_config(
-    model_name: str,
-    preprocessing_steps: List[str],
-    use_gpu: bool
-) -> Dict[str, Any]:
-    """Creates evaluation configuration.
-        
-    Args:
-        model_name (str): Name of the model being evaluated.
-        preprocessing_steps (List[str]): List of preprocessing steps applied.
-        use_gpu (bool): Whether GPU was used.
-        
-    Returns:
-        Dict[str, Any]: Evaluation configuration dictionary.
-    """
-    # Generate current timestamp (YYYYMMDD) for filename
-    timestamp = time.strftime("%Y%m%d")
-    
-    # Generate filename based on model and preprocessing steps
-    preprocess_name = "_".join(preprocessing_steps) if preprocessing_steps else "no_preprocess"
-    
-    # Combine model name and preprocessing name for config name
-    config_name = f"{timestamp}_{model_name}_{preprocess_name}"
-    
-    # Create config dictionary
-    config = {
-        'config_name': config_name,
-        'model_name': model_name,
-        'preprocessing_steps': preprocessing_steps,
-        'use_gpu': use_gpu,
-        'timestamp': timestamp
+def create_evaluation_config() -> Dict[str, Any]:
+    """Create evaluation configuration with default settings."""
+    return {
+        'data': {
+            'test_dir': 'data/test',
+            'label_dir': 'data/test',
+            'test_data_limit': 0  # 0 means no limit
+        },
+        'evaluation': {
+            'iou_threshold': 0.5,
+            'test_data_limit': 0
+        },
+        'hardware': {
+            'use_gpu': True
+        }
     }
-    
-    return config
 
 def get_next_result_number(model_name: str, preprocess_info: str) -> int:
     """Generates the next result file number for a given model and preprocessing combo.
