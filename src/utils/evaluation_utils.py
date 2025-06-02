@@ -36,7 +36,8 @@ def create_evaluation_config() -> Dict[str, Any]:
         },
         'evaluation': {
             'iou_threshold': 0.5,
-            'test_data_limit': 1
+            'test_data_limit': 1,
+            'preprocessing_steps': []  # Default empty preprocessing steps
         },
         'hardware': {
             'use_gpu': True
@@ -89,37 +90,22 @@ def get_next_report_number() -> int:
     numbers = [int(f.stem.split('_')[-1]) for f in existing_files]
     return max(numbers) + 1 if numbers else 1
 
-def save_evaluation_results(results: Dict[str, Any], eval_config: Dict[str, Any]):
-    """Saves evaluation results to a JSON file.
-        
-    Args:
-        results (Dict[str, Any]): Dictionary containing evaluation results.
-        eval_config (Dict[str, Any]): Evaluation configuration dictionary.
-    """
-    results_dir = "results"
-    os.makedirs(results_dir, exist_ok=True)
+def save_evaluation_results(results: Dict[str, Any], config: Dict[str, Any]) -> None:
+    """Save evaluation results to a JSON file."""
+    timestamp = time.strftime("%Y%m%d_%H%M%S")
+    output_dir = Path("evaluation_results")
+    output_dir.mkdir(exist_ok=True)
     
-    # Generate filename: timestamp_modelname_preprocessingcombo_sequence.json
-    preprocess_tag = "_".join(eval_config['preprocessing_steps']) if eval_config['preprocessing_steps'] else "no_preprocess"
-    today = time.strftime('%Y%m%d')
-    next_num = get_next_result_number(eval_config['model_name'], preprocess_tag)
-    filename = f"{today}_{eval_config['model_name']}_{preprocess_tag}_{next_num}.json"
-    filepath = os.path.join(results_dir, filename)
+    # Ensure preprocessing_steps key exists in eval_config
+    for model_results in results.values():
+        for eval_config in model_results.values():
+            if 'preprocessing_steps' not in eval_config:
+                eval_config['preprocessing_steps'] = []
     
-    # Convert numpy types in metrics and predictions before saving
-    serializable_metrics = convert_numpy_types(results.get('metrics', {}))
-    serializable_predictions = convert_numpy_types(results.get('predictions', []))
-    
-    serializable_results = {
-        'config': eval_config,
-        'metrics': serializable_metrics,
-        'predictions': serializable_predictions
-    }
-    
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(serializable_results, f, indent=4, ensure_ascii=False)
-    
-    print(f"Evaluation results saved to {filepath}")
+    output_file = output_dir / f"evaluation_results_{timestamp}.json"
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
+    print(f"\nResults saved to {output_file}")
 
 def load_all_results() -> Dict[str, Any]:
     """Loads all evaluation results from the results directory.
