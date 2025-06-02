@@ -74,10 +74,18 @@ class YOLOOCRModel(BaseOCRModel):
         try:
             # 1. YOLO로 텍스트 영역 검출
             results = self.yolo.predict(processed_image, device=self.device, verbose=False)
-            boxes = results[0].boxes.xyxy.cpu().numpy() if hasattr(results[0].boxes, 'xyxy') else []
-            confidences = results[0].boxes.conf.cpu().numpy() if hasattr(results[0].boxes, 'conf') else []
             
-            if len(boxes) == 0:
+            # Check if results is empty or None
+            if not results or len(results) == 0:
+                logging.warning("No results from YOLO prediction")
+                return []
+                
+            # Get boxes and confidences, handling empty cases
+            boxes = results[0].boxes.xyxy.cpu().numpy() if hasattr(results[0].boxes, 'xyxy') else np.array([])
+            confidences = results[0].boxes.conf.cpu().numpy() if hasattr(results[0].boxes, 'conf') else np.array([])
+            
+            # Check if boxes array is empty
+            if boxes.size == 0:
                 logging.warning("No text regions detected by YOLO")
                 return []
             

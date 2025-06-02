@@ -1,0 +1,40 @@
+{
+    "config": {
+        "model_name": "tesseract",
+        "preprocessing_steps": [
+            "sharpening",
+            "binarization"
+        ]
+    },
+    "metrics": {
+        "item_accuracy": 0.0,
+        "char_accuracy": 0.0,
+        "inference_time": 2.2685632705688477,
+        "type_accuracies": {},
+        "region_accuracies": {},
+        "length_accuracies": {},
+        "size_accuracies": {},
+        "text_similarity": {
+            "normalized_levenshtein": 0.3883161512027491,
+            "rouge_scores": {
+                "rouge-1": 0.41951219014205837,
+                "rouge-2": 0.219409277726148,
+                "rouge-l": 0.41951219014205837
+            },
+            "bleu_score": 0.23122875894144088
+        }
+    },
+    "predictions": [
+        [
+            [
+                "`문서번호\n\n=\n\n'진흥13600-\n\n  \n\n,0본\n그\n\n$\n[쓰\n\n때\n변\n\n1. 새마을13600- 0 관련임\n2. '93.8.10 (주) 응  06건철          계약체결한 생림면 복지회관 신축\n긍사에 대하여 다음과 같이 설계변경 시행코자 합니다.\n가. 사 업 명 생람면 복지회관신축공사\n나, 사업 개 요: 건축면면적 661.444 (1층337.442 , 2층 324ㅁ )\n다.\n라ㆍ\n배\n바ㆍ예산 과\n시설비 (\"92 명시이월 )\n\n0\n\n호\n\n;: 234.735,000원\n\n~\n글\n경\n\n[묘\n\n:-오\n\n;: 272,300.,000원 (증.37,565,000원 )\n-   '            : 제재  ,  ~   1:\n: 붙임 의견서 참조\n: 지역개발사업비 ,지역개발 ,특수지역개발,주요사업비 ,\n\n[묘\n0\n30\n\n:  께\n\n지역개발사업비 ,지역개발,특수지역개발 ,주요사엄비,\n시설비 ('93 예산)\n볼임1 1, 변경설계서 1부,\n2. 공사감독의견서 1부. 끝,\n\n256",
+                [
+                    0.0,
+                    0.0,
+                    2474.0,
+                    3492.0
+                ]
+            ]
+        ]
+    ]
+}

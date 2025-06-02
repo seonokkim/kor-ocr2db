@@ -1,0 +1,19 @@
+{
+    "config": {
+        "data": {
+            "test_dir": "data/test",
+            "label_dir": "data/test",
+            "test_data_limit": 1
+        },
+        "evaluation": {
+            "iou_threshold": 0.5,
+            "test_data_limit": 1,
+            "preprocessing_steps": []
+        },
+        "hardware": {
+            "use_gpu": true
+        }
+    },
+    "metrics": {},
+    "predictions": []
+}

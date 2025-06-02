@@ -91,21 +91,37 @@ def get_next_report_number() -> int:
     return max(numbers) + 1 if numbers else 1
 
 def save_evaluation_results(results: Dict[str, Any], config: Dict[str, Any]) -> None:
-    """Save evaluation results to a JSON file."""
-    timestamp = time.strftime("%Y%m%d_%H%M%S")
-    output_dir = Path("evaluation_results")
-    output_dir.mkdir(exist_ok=True)
+    """Saves evaluation results to a JSON file.
+        
+    Args:
+        results (Dict[str, Any]): Dictionary containing evaluation results.
+        config (Dict[str, Any]): Evaluation configuration dictionary.
+    """
+    results_dir = "results"
+    os.makedirs(results_dir, exist_ok=True)
     
-    # Ensure preprocessing_steps key exists in eval_config
-    for model_results in results.values():
-        for eval_config in model_results.values():
-            if 'preprocessing_steps' not in eval_config:
-                eval_config['preprocessing_steps'] = []
+    # Generate filename: timestamp_modelname_preprocessingcombo_sequence.json
+    model_name = config.get('model_name', 'unknown')
+    preprocess_tag = "_".join(config.get('preprocessing_steps', [])) if config.get('preprocessing_steps') else "no_preprocess"
+    today = time.strftime('%Y%m%d')
+    next_num = get_next_result_number(model_name, preprocess_tag)
+    filename = f"{today}_{model_name}_{preprocess_tag}_{next_num}.json"
+    filepath = os.path.join(results_dir, filename)
     
-    output_file = output_dir / f"evaluation_results_{timestamp}.json"
-    with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
-    print(f"\nResults saved to {output_file}")
+    # Convert numpy types in metrics and predictions before saving
+    serializable_metrics = convert_numpy_types(results.get('metrics', {}))
+    serializable_predictions = convert_numpy_types(results.get('predictions', []))
+    
+    serializable_results = {
+        'config': config,
+        'metrics': serializable_metrics,
+        'predictions': serializable_predictions
+    }
+    
+    with open(filepath, 'w', encoding='utf-8') as f:
+        json.dump(serializable_results, f, indent=4, ensure_ascii=False)
+    
+    print(f"Evaluation results saved to {filepath}")
 
 def load_all_results() -> Dict[str, Any]:
     """Loads all evaluation results from the results directory.

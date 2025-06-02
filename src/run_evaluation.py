@@ -13,17 +13,20 @@ from Levenshtein import distance as levenshtein_distance
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
+# Import all available models
+from models.easyocr import EasyOCRModel
+from models.tesseract import TesseractModel
+from models.yolo_ocr import YOLOOCRModel
+from models.azure_document_intelligence import AzureDocumentIntelligenceModel
+
 # Attempt to import PaddleOCR module
 try:
-    from models import EasyOCRModel, PaddleOCRModel, YOLOOCRModel, AzureDocumentIntelligenceModel
+    from models.paddleocr import PaddleOCRModel
     PADDLEOCR_AVAILABLE = True
-    AZURE_AVAILABLE = True
 except ImportError as e:
-    print(f"\nWarning: Could not import some modules - {str(e)}")
-    print("Some models will be excluded from evaluation.")
-    from models import EasyOCRModel, YOLOOCRModel
+    print(f"\nWarning: Could not import PaddleOCR module - {str(e)}")
+    print("PaddleOCR will be excluded from evaluation.")
     PADDLEOCR_AVAILABLE = False
-    AZURE_AVAILABLE = False
 
 from preprocessing import (
     SharpeningPreprocessor,
@@ -36,7 +39,6 @@ from utils.evaluation_utils import (
     load_all_results,
     generate_performance_report
 )
-from models import YOLOOCRModel, TesseractModel
 
 def bbox_iou(boxA, boxB):
     """Compute the Intersection over Union (IoU) of two bounding boxes.
@@ -336,7 +338,7 @@ def main():
     models = {
         'tesseract': TesseractModel(),
         'easyocr': EasyOCRModel(),
-        'yolo': YOLOOCRModel()
+        'yolo_ocr': YOLOOCRModel()
     }
     
     if PADDLEOCR_AVAILABLE:
@@ -344,8 +346,10 @@ def main():
     
     if AZURE_AVAILABLE:
         try:
-            models['azure'] = AzureDocumentIntelligenceModel()
-        except ValueError as e:
+            models['azure_read'] = AzureDocumentIntelligenceModel(mode='read')
+            models['azure_layout'] = AzureDocumentIntelligenceModel(mode='layout')
+            models['azure_prebuilt_read'] = AzureDocumentIntelligenceModel(mode='prebuilt_read')
+        except Exception as e:
             print(f"\nWarning: Azure Document Intelligence not configured - {str(e)}")
             print("Azure Document Intelligence will be excluded from evaluation.")
     
@@ -367,28 +371,26 @@ def main():
     ]
     
     # Run evaluation for each model and preprocessing combination
-    results = {}
     for model_name, model in models.items():
         print(f"\nEvaluating {model_name}...")
-        model_results = {}
-        
         for preproc_steps in preprocessing_combinations:
             preproc_name = '+'.join(preproc_steps) if preproc_steps else 'none'
             print(f"  With preprocessing: {preproc_name}")
-            
             result = evaluate_combination(model, images, ground_truth, preproc_steps)
-            model_results[preproc_name] = result
-            
-        results[model_name] = model_results
+            # Save each result as a separate file with correct config
+            save_evaluation_results(
+                result,
+                {
+                    'model_name': model_name,
+                    'preprocessing_steps': preproc_steps
+                }
+            )
     
-    # Save results
-    save_evaluation_results(results, config)
-    
-    # Generate and print performance report
+    # Generate and print performance report from all results in results dir
     print("\nGenerating performance report...")
-    report = generate_performance_report(results)
-    print("\nPerformance Report:")
-    print(report)
+    all_results = load_all_results()
+    generate_performance_report(all_results)
+    print("\nPerformance report saved as CSV in results/ directory.")
 
 if __name__ == "__main__":
     main() 
