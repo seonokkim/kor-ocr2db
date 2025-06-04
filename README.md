@@ -26,8 +26,8 @@ This repository provides a comprehensive framework for evaluating the performanc
   - Accuracy by Text Length (Short/Medium/Long)
   - Accuracy by Bounding Box Size (Small/Medium/Large)
   - Text Similarity (Normalized Levenshtein, ROUGE, BLEU)
+  - Full Text Accuracy (Exact Match, Character, Word, Normalized)
 
-- Early stopping on zero accuracy
 - Structured results saving (JSON files with sequential numbering)
 - Performance report generation (CSV files with sequential numbering)
 
@@ -100,7 +100,7 @@ This repository provides a comprehensive framework for evaluating the performanc
    - Enhanced text region combination logic
 
 2. Evaluation Improvements:
-   - Added early stopping when accuracy is zero
+   - Added full text accuracy metrics
    - Improved JSON serialization handling
    - Better error handling and logging
 

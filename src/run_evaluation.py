@@ -169,6 +169,14 @@ def evaluate_combination(
     total_chars = 0
     matched_chars = 0
     
+    # New metrics for text structure and layout
+    total_lines = 0
+    matched_lines = 0
+    total_paragraphs = 0
+    matched_paragraphs = 0
+    layout_scores = []
+    spatial_relationship_scores = []
+    
     # Counters for additional metrics
     type_metrics = {}  # Accuracy by text type
     region_metrics = {}  # Accuracy by location (top/middle/bottom)
@@ -187,6 +195,14 @@ def evaluate_combination(
     total_bleu_count = 0
     smoothing = SmoothingFunction().method1
     
+    # Variables for full text accuracy
+    total_exact_matches = 0
+    total_char_matches = 0
+    total_word_matches = 0
+    total_gt_chars = 0
+    total_gt_words = 0
+    total_normalized_matches = 0
+    
     for pred_list, gt_annotations in zip(all_predictions, ground_truth):
         # Extract text and bounding boxes from Ground Truth annotations
         gt_texts = [anno.get('annotation.text', '') for anno in gt_annotations]
@@ -194,9 +210,104 @@ def evaluate_combination(
                    for anno in gt_annotations]
         gt_types = [anno.get('annotation.ttype', 'unknown') for anno in gt_annotations]
         
+        # Group ground truth texts into lines and paragraphs
+        gt_lines = []
+        gt_paragraphs = []
+        current_line = []
+        current_paragraph = []
+        
+        for i, (text, box) in enumerate(zip(gt_texts, gt_boxes)):
+            if i > 0:
+                prev_box = gt_boxes[i-1]
+                # Check if this text belongs to the same line
+                if abs(box[1] - prev_box[1]) < 20:  # 20 pixels threshold for same line
+                    current_line.append(text)
+                else:
+                    if current_line:
+                        gt_lines.append(' '.join(current_line))
+                        current_line = []
+                    current_line.append(text)
+                
+                # Check if this text belongs to the same paragraph
+                if abs(box[1] - prev_box[3]) < 50:  # 50 pixels threshold for same paragraph
+                    current_paragraph.append(text)
+                else:
+                    if current_paragraph:
+                        gt_paragraphs.append(' '.join(current_paragraph))
+                        current_paragraph = []
+                    current_paragraph.append(text)
+            else:
+                current_line.append(text)
+                current_paragraph.append(text)
+        
+        if current_line:
+            gt_lines.append(' '.join(current_line))
+        if current_paragraph:
+            gt_paragraphs.append(' '.join(current_paragraph))
+        
         # Generate strings for full text comparison
         gt_full_text = ' '.join(gt_texts)
         pred_full_text = ' '.join([text for text, _ in pred_list])
+        
+        # Calculate full text accuracy metrics
+        # 1. Exact Match
+        if gt_full_text == pred_full_text:
+            total_exact_matches += 1
+        
+        # 2. Character-level Accuracy
+        total_gt_chars += len(gt_full_text)
+        total_char_matches += sum(1 for c1, c2 in zip(gt_full_text, pred_full_text) if c1 == c2)
+        
+        # 3. Word-level Accuracy
+        gt_words = gt_full_text.split()
+        pred_words = pred_full_text.split()
+        total_gt_words += len(gt_words)
+        total_word_matches += sum(1 for w1, w2 in zip(gt_words, pred_words) if w1 == w2)
+        
+        # 4. Normalized Accuracy
+        min_len = min(len(gt_full_text), len(pred_full_text))
+        max_len = max(len(gt_full_text), len(pred_full_text))
+        if max_len > 0:
+            total_normalized_matches += sum(1 for c1, c2 in zip(gt_full_text[:min_len], pred_full_text[:min_len]) if c1 == c2) / max_len
+        
+        # Calculate line and paragraph accuracy
+        pred_lines = [line.strip() for line in pred_full_text.split('\n') if line.strip()]
+        total_lines += len(gt_lines)
+        matched_lines += sum(1 for gt_line in gt_lines 
+                           for pred_line in pred_lines 
+                           if levenshtein_distance(gt_line, pred_line) < len(gt_line) * 0.3)
+        
+        # Calculate layout preservation score
+        if len(gt_boxes) > 1:
+            gt_spatial_relations = []
+            pred_spatial_relations = []
+            
+            for i in range(len(gt_boxes)-1):
+                for j in range(i+1, len(gt_boxes)):
+                    # Calculate relative positions
+                    gt_relation = (
+                        gt_boxes[i][0] < gt_boxes[j][0],  # left/right
+                        gt_boxes[i][1] < gt_boxes[j][1],  # top/bottom
+                        abs(gt_boxes[i][1] - gt_boxes[j][1]) < 20  # same line
+                    )
+                    gt_spatial_relations.append(gt_relation)
+            
+            for i in range(len(pred_list)-1):
+                for j in range(i+1, len(pred_list)):
+                    pred_box_i = pred_list[i][1]
+                    pred_box_j = pred_list[j][1]
+                    pred_relation = (
+                        pred_box_i[0] < pred_box_j[0],
+                        pred_box_i[1] < pred_box_j[1],
+                        abs(pred_box_i[1] - pred_box_j[1]) < 20
+                    )
+                    pred_spatial_relations.append(pred_relation)
+            
+            # Calculate spatial relationship score
+            if gt_spatial_relations and pred_spatial_relations:
+                spatial_score = sum(1 for gt, pred in zip(gt_spatial_relations, pred_spatial_relations)
+                                  if gt == pred) / len(gt_spatial_relations)
+                spatial_relationship_scores.append(spatial_score)
         
         # Calculate Levenshtein distance
         total_levenshtein_distance += levenshtein_distance(gt_full_text, pred_full_text)
@@ -215,11 +326,8 @@ def evaluate_combination(
         # Calculate BLEU score
         try:
             if gt_full_text and pred_full_text:
-                # Split sentences into words
                 reference = [gt_full_text.split()]
                 candidate = pred_full_text.split()
-                
-                # Calculate BLEU score (1-gram, 2-gram, 3-gram, 4-gram)
                 weights = [(1, 0, 0, 0), (0.5, 0.5, 0, 0), (0.33, 0.33, 0.33, 0), (0.25, 0.25, 0.25, 0.25)]
                 bleu_scores = []
                 
@@ -227,7 +335,6 @@ def evaluate_combination(
                     score = sentence_bleu(reference, candidate, weights=weight, smoothing_function=smoothing)
                     bleu_scores.append(score)
                 
-                # Calculate average BLEU score
                 total_bleu_score += sum(bleu_scores) / len(bleu_scores)
                 total_bleu_count += 1
         except Exception as e:
@@ -241,27 +348,23 @@ def evaluate_combination(
             best_iou = 0
             best_gt_idx = -1
             
-            # Find the Ground Truth with the highest IoU
             for i, (gt_text, gt_box) in enumerate(zip(gt_texts, gt_boxes)):
                 if i in matched_gt_indices:
                     continue
                     
                 iou = bbox_iou(pred_box, gt_box)
-                if iou > best_iou and iou > 0.5:  # IoU threshold
+                if iou > best_iou and iou > 0.5:
                     best_iou = iou
                     best_gt_idx = i
             
-            # If matched
             if best_gt_idx != -1:
                 matched_gt_indices.add(best_gt_idx)
                 matched_items += 1
                 
-                # Calculate character-level accuracy
                 gt_text = gt_texts[best_gt_idx]
                 total_chars += len(gt_text)
                 matched_chars += sum(1 for c1, c2 in zip(pred_text, gt_text) if c1 == c2)
                 
-                # Accuracy by text type
                 gt_type = gt_types[best_gt_idx]
                 if gt_type not in type_metrics:
                     type_metrics[gt_type] = {'total': 0, 'matched': 0}
@@ -269,7 +372,6 @@ def evaluate_combination(
                 if pred_text == gt_text:
                     type_metrics[gt_type]['matched'] += 1
                 
-                # Accuracy by location (top/middle/bottom)
                 y_center = (gt_box[1] + gt_box[3]) / 2
                 region = 'top' if y_center < 0.33 else 'middle' if y_center < 0.66 else 'bottom'
                 if region not in region_metrics:
@@ -278,7 +380,6 @@ def evaluate_combination(
                 if pred_text == gt_text:
                     region_metrics[region]['matched'] += 1
                 
-                # Accuracy by text length
                 length = len(gt_text)
                 length_key = 'short' if length <= 2 else 'medium' if length <= 5 else 'long'
                 if length_key not in length_metrics:
@@ -287,7 +388,6 @@ def evaluate_combination(
                 if pred_text == gt_text:
                     length_metrics[length_key]['matched'] += 1
                 
-                # Accuracy by bounding box size
                 box_area = (gt_box[2] - gt_box[0]) * (gt_box[3] - gt_box[1])
                 size_key = 'small' if box_area < 1000 else 'medium' if box_area < 5000 else 'large'
                 if size_key not in size_metrics:
@@ -299,6 +399,16 @@ def evaluate_combination(
     # Calculate final accuracies
     item_accuracy = float(matched_items) / total_items if total_items > 0 else 0.0
     char_accuracy = float(matched_chars) / total_chars if total_chars > 0 else 0.0
+    line_accuracy = float(matched_lines) / total_lines if total_lines > 0 else 0.0
+    spatial_relationship_score = float(sum(spatial_relationship_scores)) / len(spatial_relationship_scores) if spatial_relationship_scores else 0.0
+    
+    # Calculate full text accuracy metrics
+    full_text_accuracy = {
+        'exact_match': float(total_exact_matches) / len(all_predictions) if all_predictions else 0.0,
+        'char_accuracy': float(total_char_matches) / total_gt_chars if total_gt_chars > 0 else 0.0,
+        'word_accuracy': float(total_word_matches) / total_gt_words if total_gt_words > 0 else 0.0,
+        'normalized_accuracy': float(total_normalized_matches) / len(all_predictions) if all_predictions else 0.0
+    }
     
     # Calculate additional metrics
     type_accuracies = {k: float(v['matched']) / v['total'] if v['total'] > 0 else 0.0 
@@ -320,6 +430,8 @@ def evaluate_combination(
         'metrics': {
             'item_accuracy': item_accuracy,
             'char_accuracy': char_accuracy,
+            'line_accuracy': line_accuracy,
+            'spatial_relationship_score': spatial_relationship_score,
             'inference_time': inference_time,
             'type_accuracies': type_accuracies,
             'region_accuracies': region_accuracies,
@@ -329,7 +441,8 @@ def evaluate_combination(
                 'normalized_levenshtein': normalized_levenshtein,
                 'rouge_scores': rouge_scores,
                 'bleu_score': bleu_score
-            }
+            },
+            'full_text_accuracy': full_text_accuracy
         },
         'predictions': all_predictions
     }
@@ -401,11 +514,7 @@ def main():
                     'preprocessing_steps': preproc_steps
                 }
             )
-            # 평가 결과가 0점일 경우 중단
-            item_acc = result.get('metrics', {}).get('item_accuracy', None)
-            if item_acc is not None and (item_acc == 0.0 or item_acc is False):
-                print(f"\nEvaluation stopped: {model_name} + {preproc_name}의 item_accuracy가 0점입니다.")
-                return
+            print(f"Evaluation results saved for {model_name} with preprocessing: {preproc_name}")
     
     # Generate and print performance report from all results in results dir
     print("\nGenerating performance report...")

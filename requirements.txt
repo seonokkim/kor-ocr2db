@@ -19,4 +19,5 @@ python-Levenshtein>=0.27.1
 rouge-score>=0.1.2
 nltk>=3.9.1
 python-dotenv>=0.19.0  # For .env file support
-azure-ai-formrecognizer>=3.3.0  # For Azure Document Intelligence 
+azure-ai-formrecognizer>=3.3.0  # For Azure Document Intelligence
+scikit-learn>=1.4.0  # For metrics calculation 

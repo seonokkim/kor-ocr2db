@@ -6,7 +6,7 @@
     "metrics": {
         "item_accuracy": 0.0,
         "char_accuracy": 0.0,
-        "inference_time": 0.00014972686767578125,
+        "inference_time": 0.0012197494506835938,
         "type_accuracies": {},
         "region_accuracies": {},
         "length_accuracies": {},

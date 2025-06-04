@@ -188,50 +188,16 @@ def plot_performance_comparison(df: pd.DataFrame, metric: str = 'item_accuracy')
     return plt
 
 def generate_performance_report(all_results: Dict[str, Any]) -> pd.DataFrame:
-    """Analyzes evaluation results, generates a performance report, and saves it as CSV.
-        
-    Args:
-        all_results (Dict[str, Any]): Dictionary containing all loaded evaluation results.
-        
-    Returns:
-        pd.DataFrame: Pandas DataFrame containing the performance report.
-    """
+    """Analyzes evaluation results, generates a performance report, and saves it as CSV."""
     report_list = []
     
-    # Define mapping from model_name to 근본 모델(method)
+    # Model method mapping
     model_method_map = {
-        'base_easyocr': {
-            'text_detection': 'CRAFT',
-            'text_recognition': 'CRNN (CNN + BiLSTM + CTC)'
-        },
-        'easyocr': {
-            'text_detection': 'CRAFT',
-            'text_recognition': 'CRNN (CNN + BiLSTM + CTC)'
-        },
-        'base_paddleocr': {
-            'text_detection': 'DBNet/EAST',
-            'text_recognition': 'CRNN/SVTR'
-        },
-        'paddleocr': {
-            'text_detection': 'DBNet/EAST',
-            'text_recognition': 'CRNN/SVTR'
-        },
-        'base_tesseract': {
-            'text_detection': 'Layout Analysis',
-            'text_recognition': 'LSTM + CTC'
-        },
-        'tesseract': {
-            'text_detection': 'Layout Analysis',
-            'text_recognition': 'LSTM + CTC'
-        },
-        'base_yolo_ocr': {
-            'text_detection': 'YOLOv5/YOLOv8',
-            'text_recognition': 'External OCR'
-        },
-        'yolo_ocr': {
-            'text_detection': 'YOLOv5/YOLOv8',
-            'text_recognition': 'External OCR'
-        }
+        'base_tesseract': {'text_detection': 'tesseract', 'text_recognition': 'tesseract'},
+        'base_easyocr': {'text_detection': 'easyocr', 'text_recognition': 'easyocr'},
+        'base_paddleocr': {'text_detection': 'paddleocr', 'text_recognition': 'paddleocr'},
+        'base_yolo_ocr': {'text_detection': 'yolo', 'text_recognition': 'yolo'},
+        'base_azure_read': {'text_detection': 'azure', 'text_recognition': 'azure'}
     }
     
     for config_key, result_data in all_results.items():
@@ -274,22 +240,20 @@ def generate_performance_report(all_results: Dict[str, Any]) -> pd.DataFrame:
                 for rouge_type, score in ts_metrics['rouge_scores'].items():
                     row[f'average_rouge_{rouge_type}'] = score
         
+        # Add Full Text Accuracy metrics
+        if 'full_text_accuracy' in metrics:
+            ft_metrics = metrics['full_text_accuracy']
+            row['full_text_exact_match'] = ft_metrics.get('exact_match', 0)
+            row['full_text_char_accuracy'] = ft_metrics.get('char_accuracy', 0)
+            row['full_text_word_accuracy'] = ft_metrics.get('word_accuracy', 0)
+            row['full_text_normalized_accuracy'] = ft_metrics.get('normalized_accuracy', 0)
+        
         report_list.append(row)
     
-    # Create DataFrame and sort by model_name and preprocessing_steps
+    # Create DataFrame and save to CSV
     df = pd.DataFrame(report_list)
-    df = df.sort_values(['model_name', 'preprocessing_steps'])
-    
-    # Save to CSV
-    results_dir = Path('results')
-    results_dir.mkdir(exist_ok=True)
-    
-    today = time.strftime('%Y%m%d')
-    next_num = get_next_report_number()
-    filename = f"{today}_performance_report_{next_num}.csv"
-    filepath = results_dir / filename
-    
-    df.to_csv(filepath, index=False)
-    print(f"Performance report saved to {filepath}")
+    timestamp = datetime.now().strftime("%Y%m%d")
+    csv_path = f"results/{timestamp}_performance_report_{len(report_list)}.csv"
+    df.to_csv(csv_path, index=False)
     
     return df 
