@@ -11,8 +11,8 @@ class YOLOOCRModel(BaseOCRModel):
         self.device = "cuda" if use_gpu else "cpu"
         self.yolo = YOLO(yolo_model_path)
         self.ocr = easyocr.Reader(['ko'], gpu=use_gpu)
-        self.confidence_threshold = 0.3  # 신뢰도 임계값 낮춤
-        self.iou_threshold = 0.3  # IoU 임계값
+        self.confidence_threshold = 0.1  # 신뢰도 임계값을 더 낮춤
+        self.iou_threshold = 0.2  # IoU 임계값을 더 낮춤
 
     def preprocess(self, image: np.ndarray) -> np.ndarray:
         # YOLO와 EasyOCR 모두 BGR 이미지를 사용하므로 별도 전처리 없음
@@ -41,14 +41,14 @@ class YOLOOCRModel(BaseOCRModel):
             last_box = current_group[-1][0]
             current_box = boxes[i]
             
-            # x 좌표가 가까우면 같은 그룹으로
+            # x 좌표가 가까우면 같은 그룹으로 (임계값 조정)
             if current_box[0] - last_box[2] < self.iou_threshold * (current_box[2] - current_box[0]):
                 current_group.append((current_box, texts[i], confidences[i]))
             else:
                 # 그룹 결합
                 if current_group:
                     combined_box = self._merge_boxes([b[0] for b in current_group])
-                    combined_text = ''.join([t[1] for t in current_group])
+                    combined_text = ' '.join([t[1] for t in current_group])  # 공백으로 구분
                     avg_confidence = sum([c[2] for c in current_group]) / len(current_group)
                     combined_results.append((combined_text, combined_box, avg_confidence))
                 current_group = [(current_box, texts[i], confidences[i])]
@@ -56,7 +56,7 @@ class YOLOOCRModel(BaseOCRModel):
         # 마지막 그룹 처리
         if current_group:
             combined_box = self._merge_boxes([b[0] for b in current_group])
-            combined_text = ''.join([t[1] for t in current_group])
+            combined_text = ' '.join([t[1] for t in current_group])  # 공백으로 구분
             avg_confidence = sum([c[2] for c in current_group]) / len(current_group)
             combined_results.append((combined_text, combined_box, avg_confidence))
         
@@ -73,7 +73,7 @@ class YOLOOCRModel(BaseOCRModel):
     def predict(self, processed_image: np.ndarray):
         try:
             # 1. YOLO로 텍스트 영역 검출
-            results = self.yolo.predict(processed_image, device=self.device, verbose=False, conf=0.3)
+            results = self.yolo.predict(processed_image, device=self.device, verbose=False, conf=0.1)  # 신뢰도 임계값 낮춤
             
             # Check if results is empty or None
             if not results or len(results) == 0:
@@ -97,16 +97,19 @@ class YOLOOCRModel(BaseOCRModel):
             for box, conf in zip(boxes, confidences):
                 if conf < self.confidence_threshold:
                     continue
-                    
                 x1, y1, x2, y2 = map(int, box)
                 # 박스가 이미지 경계를 벗어나지 않도록 조정
                 x1 = max(0, x1)
                 y1 = max(0, y1)
                 x2 = min(processed_image.shape[1], x2)
                 y2 = min(processed_image.shape[0], y2)
-                
-                # 박스가 너무 작으면 건너뛰기
-                if x2 - x1 < 10 or y2 - y1 < 10:
+                # 박스가 너무 작으면 건너뛰기 (크기 제한 완화)
+                if x2 - x1 < 5 or y2 - y1 < 5:
+                    continue
+                # 박스가 너무 크면 건너뛰기 (이미지 면적의 50% 이상)
+                img_area = processed_image.shape[0] * processed_image.shape[1]
+                box_area = (x2 - x1) * (y2 - y1)
+                if box_area > img_area * 0.5:
                     continue
                 
                 crop = processed_image[y1:y2, x1:x2]
@@ -126,7 +129,10 @@ class YOLOOCRModel(BaseOCRModel):
             combined_results = self._combine_text_regions(valid_boxes, texts, valid_confidences)
             
             # 4. 최종 결과 형식 변환
-            predictions = [(text, box) for text, box, _ in combined_results]
+            def to_py_type_box(box):
+                # Convert all elements to int (or float if needed)
+                return [int(x) if int(x) == x else float(x) for x in box]
+            predictions = [(text, to_py_type_box(box)) for text, box, _ in combined_results]
             
             logging.debug(f"YOLO OCR predictions: {predictions}")
             return predictions

@@ -108,15 +108,12 @@ def save_evaluation_results(results: Dict[str, Any], config: Dict[str, Any]) -> 
     filename = f"{today}_{model_name}_{preprocess_tag}_{next_num}.json"
     filepath = os.path.join(results_dir, filename)
     
-    # Convert numpy types in metrics and predictions before saving
-    serializable_metrics = convert_numpy_types(results.get('metrics', {}))
-    serializable_predictions = convert_numpy_types(results.get('predictions', []))
-    
-    serializable_results = {
+    # Convert all numpy types in the results dictionary
+    serializable_results = convert_numpy_types({
         'config': config,
-        'metrics': serializable_metrics,
-        'predictions': serializable_predictions
-    }
+        'metrics': results.get('metrics', {}),
+        'predictions': results.get('predictions', [])
+    })
     
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(serializable_results, f, indent=4, ensure_ascii=False)

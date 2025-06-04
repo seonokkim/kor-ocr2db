@@ -15,6 +15,7 @@ import json
 from Levenshtein import distance as levenshtein_distance
 from rouge import Rouge
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+import argparse
 
 # Import all available models
 from models.easyocr import EasyOCRModel
@@ -334,27 +335,39 @@ def evaluate_combination(
     }
 
 def main():
-    # Load configuration
+    # Add argparse for model selection
+    parser = argparse.ArgumentParser(description="OCR Evaluation")
+    parser.add_argument('--models', type=str, default=None, help='Comma-separated list of models to evaluate (e.g., yolo_ocr,azure_read)')
+    args = parser.parse_args()
+
     config = create_evaluation_config()
     
-    # Initialize models
-    models = {
+    # Initialize all available models
+    all_models = {
         'tesseract': TesseractModel(),
         'easyocr': EasyOCRModel(),
         'yolo_ocr': YOLOOCRModel()
     }
-    
     if PADDLEOCR_AVAILABLE:
-        models['paddleocr'] = PaddleOCRModel()
-    
+        all_models['paddleocr'] = PaddleOCRModel()
     if AZURE_AVAILABLE:
         try:
-            models['azure_read'] = AzureDocumentIntelligenceModel(mode='read')
-            models['azure_layout'] = AzureDocumentIntelligenceModel(mode='layout')
-            models['azure_prebuilt_read'] = AzureDocumentIntelligenceModel(mode='prebuilt_read')
+            all_models['azure_read'] = AzureDocumentIntelligenceModel(mode='read')
+            all_models['azure_layout'] = AzureDocumentIntelligenceModel(mode='layout')
+            all_models['azure_prebuilt_read'] = AzureDocumentIntelligenceModel(mode='prebuilt_read')
         except Exception as e:
             print(f"\nWarning: Azure Document Intelligence not configured - {str(e)}")
             print("Azure Document Intelligence will be excluded from evaluation.")
+    
+    # Filter models if --models is specified
+    if args.models:
+        selected = [m.strip() for m in args.models.split(',')]
+        models = {k: v for k, v in all_models.items() if k in selected}
+        if not models:
+            print(f"No valid models selected from: {selected}")
+            return
+    else:
+        models = all_models
     
     # Load test data
     print("\nLoading test data...")
@@ -388,6 +401,11 @@ def main():
                     'preprocessing_steps': preproc_steps
                 }
             )
+            # 평가 결과가 0점일 경우 중단
+            item_acc = result.get('metrics', {}).get('item_accuracy', None)
+            if item_acc is not None and (item_acc == 0.0 or item_acc is False):
+                print(f"\nEvaluation stopped: {model_name} + {preproc_name}의 item_accuracy가 0점입니다.")
+                return
     
     # Generate and print performance report from all results in results dir
     print("\nGenerating performance report...")
