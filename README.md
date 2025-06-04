@@ -8,7 +8,7 @@ This repository provides a comprehensive framework for evaluating the performanc
   - EasyOCR
   - PaddleOCR (Optional - requires successful installation)
   - Tesseract
-  - YOLO-based OCR
+  - YOLO-based OCR (with improved text detection)
   - Azure Document Intelligence (with three modes: read, layout, prebuilt_read)
 
 - Modular image preprocessing steps:
@@ -27,6 +27,7 @@ This repository provides a comprehensive framework for evaluating the performanc
   - Accuracy by Bounding Box Size (Small/Medium/Large)
   - Text Similarity (Normalized Levenshtein, ROUGE, BLEU)
 
+- Early stopping on zero accuracy
 - Structured results saving (JSON files with sequential numbering)
 - Performance report generation (CSV files with sequential numbering)
 
@@ -38,7 +39,7 @@ This repository provides a comprehensive framework for evaluating the performanc
   ```bash
   # Ubuntu/Debian
   sudo apt-get update
-  sudo apt-get install -y libgl1-mesa-glx tesseract-ocr
+  sudo apt-get install -y libgl1-mesa-glx tesseract-ocr ccache
   ```
 
 ## Setup
@@ -78,7 +79,11 @@ This repository provides a comprehensive framework for evaluating the performanc
 
 3. Run the evaluation script:
    ```bash
+   # Evaluate all models
    python src/run_evaluation.py
+
+   # Evaluate specific models
+   python src/run_evaluation.py --models yolo_ocr,azure_read
    ```
    This will perform the evaluation based on your configuration, save detailed results as JSON files with sequential numbering, and generate a performance report CSV file with sequential numbering in the `results/` directory.
 
@@ -86,6 +91,23 @@ This repository provides a comprehensive framework for evaluating the performanc
    ```bash
    python src/train.py
    ```
+
+## Recent Improvements
+
+1. YOLO OCR Enhancements:
+   - Improved text detection by filtering out oversized bounding boxes
+   - Adjusted confidence thresholds for better text detection
+   - Enhanced text region combination logic
+
+2. Evaluation Improvements:
+   - Added early stopping when accuracy is zero
+   - Improved JSON serialization handling
+   - Better error handling and logging
+
+3. Performance Optimizations:
+   - Added ccache support for faster compilation
+   - Optimized preprocessing pipeline
+   - Improved memory usage
 
 ## Troubleshooting
 
@@ -108,6 +130,10 @@ This repository provides a comprehensive framework for evaluating the performanc
 3. CUDA/GPU Issues:
    - If you encounter CUDA-related errors, ensure you have the correct CUDA version installed for your PyTorch version
    - You can force CPU usage by setting `use_gpu: false` in the config file
+
+4. YOLO OCR Issues:
+   - If text detection is poor, try adjusting the confidence threshold in `src/models/yolo_ocr.py`
+   - Consider using a document-specific YOLO model for better text detection
 
 ## Project Structure
 
