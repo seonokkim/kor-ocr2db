@@ -30,6 +30,17 @@ This repository provides a comprehensive framework for evaluating the performanc
 - Structured results saving (JSON files with sequential numbering)
 - Performance report generation (CSV files with sequential numbering)
 
+## System Requirements
+
+- Python 3.10 or higher
+- CUDA-compatible GPU (optional, for GPU acceleration)
+- System dependencies:
+  ```bash
+  # Ubuntu/Debian
+  sudo apt-get update
+  sudo apt-get install -y libgl1-mesa-glx tesseract-ocr
+  ```
+
 ## Setup
 
 1. Clone the repository:
@@ -40,8 +51,8 @@ This repository provides a comprehensive framework for evaluating the performanc
 
 2. Create and activate a virtual environment:
    ```bash
-   python -m venv .venv38
-   source .venv38/bin/activate
+   python -m venv .venv
+   source .venv/bin/activate
    ```
 
 3. Install dependencies:
@@ -76,6 +87,28 @@ This repository provides a comprehensive framework for evaluating the performanc
    python src/train.py
    ```
 
+## Troubleshooting
+
+1. OpenCV Issues:
+   - If you encounter `libGL.so.1` errors, install the required system dependencies:
+     ```bash
+     sudo apt-get update && sudo apt-get install -y libgl1-mesa-glx
+     ```
+
+2. Tesseract Issues:
+   - Ensure Tesseract is installed on your system:
+     ```bash
+     sudo apt-get install -y tesseract-ocr
+     ```
+   - For Korean language support:
+     ```bash
+     sudo apt-get install -y tesseract-ocr-kor
+     ```
+
+3. CUDA/GPU Issues:
+   - If you encounter CUDA-related errors, ensure you have the correct CUDA version installed for your PyTorch version
+   - You can force CPU usage by setting `use_gpu: false` in the config file
+
 ## Project Structure
 
 ```
@@ -101,4 +134,10 @@ kor-ocr2db/
 
 ## License
 
-MIT License 
+MIT License
+
+## Author
+
+- Name: Riley Kim
+- Email: seonokrkim@gmail.com
+- GitHub: [seonokkim](https://github.com/seonokkim) 
