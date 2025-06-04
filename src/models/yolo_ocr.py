@@ -11,8 +11,8 @@ class YOLOOCRModel(BaseOCRModel):
         self.device = "cuda" if use_gpu else "cpu"
         self.yolo = YOLO(yolo_model_path)
         self.ocr = easyocr.Reader(['ko'], gpu=use_gpu)
-        self.confidence_threshold = 0.1  # 신뢰도 임계값을 더 낮춤
-        self.iou_threshold = 0.2  # IoU 임계값을 더 낮춤
+        self.confidence_threshold = 0.05  # 신뢰도 임계값을 더 낮춤
+        self.iou_threshold = 0.3  # IoU 임계값을 높임
 
     def preprocess(self, image: np.ndarray) -> np.ndarray:
         # YOLO와 EasyOCR 모두 BGR 이미지를 사용하므로 별도 전처리 없음
@@ -73,7 +73,7 @@ class YOLOOCRModel(BaseOCRModel):
     def predict(self, processed_image: np.ndarray):
         try:
             # 1. YOLO로 텍스트 영역 검출
-            results = self.yolo.predict(processed_image, device=self.device, verbose=False, conf=0.1)  # 신뢰도 임계값 낮춤
+            results = self.yolo.predict(processed_image, device=self.device, verbose=False, conf=0.05)  # 신뢰도 임계값 낮춤
             
             # Check if results is empty or None
             if not results or len(results) == 0:
@@ -104,12 +104,12 @@ class YOLOOCRModel(BaseOCRModel):
                 x2 = min(processed_image.shape[1], x2)
                 y2 = min(processed_image.shape[0], y2)
                 # 박스가 너무 작으면 건너뛰기 (크기 제한 완화)
-                if x2 - x1 < 5 or y2 - y1 < 5:
+                if x2 - x1 < 3 or y2 - y1 < 3:  # 최소 크기 제한 완화
                     continue
-                # 박스가 너무 크면 건너뛰기 (이미지 면적의 50% 이상)
+                # 박스가 너무 크면 건너뛰기 (이미지 면적의 70% 이상)
                 img_area = processed_image.shape[0] * processed_image.shape[1]
                 box_area = (x2 - x1) * (y2 - y1)
-                if box_area > img_area * 0.5:
+                if box_area > img_area * 0.7:  # 최대 크기 제한 완화
                     continue
                 
                 crop = processed_image[y1:y2, x1:x2]
