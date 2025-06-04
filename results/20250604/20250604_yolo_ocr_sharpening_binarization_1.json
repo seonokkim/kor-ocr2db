@@ -1,0 +1,48 @@
+{
+    "config": {
+        "model_name": "yolo_ocr",
+        "preprocessing_steps": [
+            "sharpening",
+            "binarization"
+        ]
+    },
+    "metrics": {
+        "item_accuracy": 0.008403361344537815,
+        "char_accuracy": 1.0,
+        "inference_time": 0.11754870414733887,
+        "type_accuracies": {
+            "textType1": 1.0
+        },
+        "region_accuracies": {
+            "bottom": 1.0
+        },
+        "length_accuracies": {
+            "short": 1.0
+        },
+        "size_accuracies": {
+            "large": 1.0
+        },
+        "text_similarity": {
+            "normalized_levenshtein": 0.002207505518763808,
+            "rouge_scores": {
+                "rouge-1": 0.021505376131344667,
+                "rouge-2": 0.0,
+                "rouge-l": 0.021505376131344667
+            },
+            "bleu_score": 1.2078762259522556e-53
+        }
+    },
+    "predictions": [
+        [
+            [
+                "장",
+                [
+                    1763.0960693359375,
+                    3107.822998046875,
+                    1851.0797119140625,
+                    3177.198486328125
+                ]
+            ]
+        ]
+    ]
+}

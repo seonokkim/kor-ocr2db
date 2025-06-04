@@ -1,12 +1,14 @@
 {
     "config": {
-        "model_name": "yolo_ocr",
-        "preprocessing_steps": []
+        "model_name": "tesseract",
+        "preprocessing_steps": [
+            "binarization"
+        ]
     },
     "metrics": {
         "item_accuracy": 0.0,
         "char_accuracy": 0.0,
-        "inference_time": 0.7866330146789551,
+        "inference_time": 0.3717765808105469,
         "type_accuracies": {},
         "region_accuracies": {},
         "length_accuracies": {},
@@ -22,6 +24,16 @@
         }
     },
     "predictions": [
-        []
+        [
+            [
+                "",
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            ]
+        ]
     ]
 }

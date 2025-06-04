@@ -2,15 +2,13 @@
     "config": {
         "model_name": "tesseract",
         "preprocessing_steps": [
-            "sharpening",
-            "denoising",
-            "binarization"
+            "sharpening"
         ]
     },
     "metrics": {
         "item_accuracy": 0.0,
         "char_accuracy": 0.0,
-        "inference_time": 7.759990453720093,
+        "inference_time": 0.32856035232543945,
         "type_accuracies": {},
         "region_accuracies": {},
         "length_accuracies": {},
