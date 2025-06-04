@@ -11,7 +11,7 @@ class YOLOOCRModel(BaseOCRModel):
         self.device = "cuda" if use_gpu else "cpu"
         self.yolo = YOLO(yolo_model_path)
         self.ocr = easyocr.Reader(['ko'], gpu=use_gpu)
-        self.confidence_threshold = 0.5  # 신뢰도 임계값
+        self.confidence_threshold = 0.3  # 신뢰도 임계값 낮춤
         self.iou_threshold = 0.3  # IoU 임계값
 
     def preprocess(self, image: np.ndarray) -> np.ndarray:
@@ -73,7 +73,7 @@ class YOLOOCRModel(BaseOCRModel):
     def predict(self, processed_image: np.ndarray):
         try:
             # 1. YOLO로 텍스트 영역 검출
-            results = self.yolo.predict(processed_image, device=self.device, verbose=False)
+            results = self.yolo.predict(processed_image, device=self.device, verbose=False, conf=0.3)
             
             # Check if results is empty or None
             if not results or len(results) == 0:
@@ -99,6 +99,16 @@ class YOLOOCRModel(BaseOCRModel):
                     continue
                     
                 x1, y1, x2, y2 = map(int, box)
+                # 박스가 이미지 경계를 벗어나지 않도록 조정
+                x1 = max(0, x1)
+                y1 = max(0, y1)
+                x2 = min(processed_image.shape[1], x2)
+                y2 = min(processed_image.shape[0], y2)
+                
+                # 박스가 너무 작으면 건너뛰기
+                if x2 - x1 < 10 or y2 - y1 < 10:
+                    continue
+                
                 crop = processed_image[y1:y2, x1:x2]
                 
                 # EasyOCR로 텍스트 인식
@@ -107,9 +117,10 @@ class YOLOOCRModel(BaseOCRModel):
                     # 가장 신뢰도 높은 결과 사용
                     ocr_results.sort(key=lambda x: x[2], reverse=True)
                     text = ocr_results[0][1]
-                    texts.append(text)
-                    valid_boxes.append(box)
-                    valid_confidences.append(conf)
+                    if text.strip():  # 빈 텍스트가 아닌 경우만 추가
+                        texts.append(text)
+                        valid_boxes.append(box)
+                        valid_confidences.append(conf)
             
             # 3. 인접한 텍스트 영역 결합
             combined_results = self._combine_text_regions(valid_boxes, texts, valid_confidences)

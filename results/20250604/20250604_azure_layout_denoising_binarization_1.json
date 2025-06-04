@@ -1,0 +1,30 @@
+{
+    "config": {
+        "model_name": "azure_layout",
+        "preprocessing_steps": [
+            "denoising",
+            "binarization"
+        ]
+    },
+    "metrics": {
+        "item_accuracy": 0.0,
+        "char_accuracy": 0.0,
+        "inference_time": 12.339918851852417,
+        "type_accuracies": {},
+        "region_accuracies": {},
+        "length_accuracies": {},
+        "size_accuracies": {},
+        "text_similarity": {
+            "normalized_levenshtein": 0.0,
+            "rouge_scores": {
+                "rouge-1": 0.0,
+                "rouge-2": 0.0,
+                "rouge-l": 0.0
+            },
+            "bleu_score": 0.0
+        }
+    },
+    "predictions": [
+        []
+    ]
+}

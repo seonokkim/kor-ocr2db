@@ -2,6 +2,9 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+# Define global variable for Azure availability
+AZURE_AVAILABLE = True
+
 import time
 import yaml
 from pathlib import Path

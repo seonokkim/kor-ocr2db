@@ -60,8 +60,8 @@ class AzureDocumentIntelligenceModel(BaseOCRModel):
             # 텍스트와 바운딩 박스 추출
             for page in result.pages:
                 for line in page.lines:
-                    # 바운딩 박스 좌표 추출
-                    points = line.bounding_polygon
+                    # 바운딩 박스 좌표 추출 (polygon 또는 bounding_polygon 사용)
+                    points = getattr(line, 'polygon', None) or getattr(line, 'bounding_polygon', None)
                     if points and len(points) >= 4:
                         x_coords = [p.x for p in points]
                         y_coords = [p.y for p in points]
