@@ -1,21 +1,15 @@
 from abc import ABC, abstractmethod
-import torch
 import yaml
 from pathlib import Path
 
 class BaseOCRModel(ABC):
     def __init__(self, config_path: str = "configs/default_config.yaml"):
         self.config = self._load_config(config_path)
-        self.device = self._setup_device()
+        self.device = "cpu"  # Azure OCR runs on cloud, so we don't need GPU
         
     def _load_config(self, config_path: str) -> dict:
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
-    
-    def _setup_device(self) -> str:
-        if self.config['hardware']['use_gpu'] and torch.cuda.is_available():
-            return "cuda"
-        return "cpu"
     
     @abstractmethod
     def preprocess(self, image):
